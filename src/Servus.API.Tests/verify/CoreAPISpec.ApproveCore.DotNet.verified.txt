@@ -1,0 +1,522 @@
+﻿[assembly: System.Reflection.AssemblyMetadata("RepositoryUrl", "https://github.com/Leberkas-org/servus")]
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Servus.Tests")]
+[assembly: System.Runtime.Versioning.TargetFramework(".NETCoreApp,Version=v8.0", FrameworkDisplayName=".NET 8.0")]
+namespace Servus.Application.Console
+{
+    public sealed class ProcessOutRedirector : System.IDisposable
+    {
+        public ProcessOutRedirector(System.Diagnostics.Process process) { }
+        public void Dispose() { }
+        public void RedirectAndWait(int timeoutMs = -1) { }
+        public System.Threading.Tasks.Task RedirectAndWaitAsync(int timeoutMs = -1) { }
+        public void StartRedirection() { }
+        public System.Threading.Tasks.Task StartRedirectionAsync() { }
+        public void StopRedirection() { }
+    }
+    public class ServusConsole
+    {
+        public ServusConsole() { }
+        public static void PrintKeyValue(System.Collections.Generic.KeyValuePair<string, string> keyValuePair, int width = 14, System.ConsoleColor keyColor = 3, int indent = 2) { }
+        public static void PrintKeyValue(string key, string value, int width = 14, System.ConsoleColor keyColor = 3, int indent = 2) { }
+        public static void PrintKeyValue<TKey, TValue>(System.Collections.Generic.KeyValuePair<TKey, TValue> keyValuePair, int width = 14, System.ConsoleColor keyColor = 3, int indent = 2) { }
+        public static void PrintLine(int length = 80, char lineChar = =) { }
+        public static void WriteColored(string value, System.ConsoleColor color) { }
+        public static void WriteLineColored(string value, System.ConsoleColor color) { }
+    }
+}
+namespace Servus.Application.HealthChecks
+{
+    public abstract class HealthCheckSetupContainer : Servus.Application.Startup.ApplicationSetupContainer<Microsoft.AspNetCore.Builder.WebApplication>, Servus.Application.Startup.IServiceSetupContainer, Servus.Application.Startup.ISetupContainer
+    {
+        protected HealthCheckSetupContainer() { }
+        protected virtual string UrlPattern { get; }
+        protected override sealed void SetupApplication(Microsoft.AspNetCore.Builder.WebApplication app) { }
+        protected virtual void SetupEndpointConventions(Microsoft.AspNetCore.Builder.IEndpointConventionBuilder builder) { }
+        protected abstract void SetupHealthChecks(Microsoft.Extensions.DependencyInjection.IHealthChecksBuilder builder);
+        public void SetupServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration) { }
+    }
+}
+namespace Servus.Application
+{
+    public static class ServiceProviderExtensions
+    {
+        public static object ResolveExternal(this System.IServiceProvider serviceProvider, System.Type type) { }
+        public static T ResolveExternal<T>(this System.IServiceProvider serviceProvider) { }
+    }
+    public static class ServusApplication
+    {
+        public static string? GetEnvironmentVariable(string name) { }
+        public static bool IsEnvironmentVariableSetTo(string name, string value) { }
+    }
+    public static class ServusLogo
+    {
+        public static readonly string Logo;
+        public static readonly string LogoSmall;
+        public static readonly string LogoTiny;
+    }
+}
+namespace Servus.Application.Startup
+{
+    public class AppBuilder
+    {
+        public Servus.Application.Startup.AppRunner Build() { }
+        public Servus.Application.Startup.AppBuilder OnApplicationStarted(System.Action<System.IServiceProvider> started) { }
+        public Servus.Application.Startup.AppBuilder OnApplicationStopped(System.Action stopped) { }
+        public Servus.Application.Startup.AppBuilder OnApplicationStopping(System.Action stopping) { }
+        public Servus.Application.Startup.AppBuilder WithSetup(Servus.Application.Startup.ISetupContainer container) { }
+        public Servus.Application.Startup.AppBuilder WithSetup<TContainer>()
+            where TContainer :  class, Servus.Application.Startup.ISetupContainer, new () { }
+        public Servus.Application.Startup.AppBuilder WithStartupGate(Servus.Application.Startup.Gates.IStartupGate gate) { }
+        public Servus.Application.Startup.AppBuilder WithStartupGate(System.Func<System.Threading.Tasks.Task<bool>> gate) { }
+        public Servus.Application.Startup.AppBuilder WithStartupGate<TGate>()
+            where TGate :  class, Servus.Application.Startup.Gates.IStartupGate, new () { }
+        public static Servus.Application.Startup.AppBuilder Create() { }
+        public static Servus.Application.Startup.AppBuilder Create<T>(T builder, System.Func<T, Microsoft.Extensions.Hosting.IHost> createHost)
+            where T : Microsoft.Extensions.Hosting.IHostApplicationBuilder { }
+    }
+    public class AppRunner
+    {
+        public System.Threading.Tasks.Task RunAsync(System.Threading.CancellationToken token = default) { }
+        public System.Threading.Tasks.Task StartAsync(System.Threading.CancellationToken token) { }
+    }
+    public abstract class ApplicationSetupContainer : Servus.Application.Startup.ISetupContainer
+    {
+        protected ApplicationSetupContainer() { }
+        protected abstract void SetupApplication(Microsoft.AspNetCore.Builder.IApplicationBuilder app);
+    }
+    public abstract class ApplicationSetupContainer<THost> : Servus.Application.Startup.ApplicationSetupContainer
+        where THost : Microsoft.AspNetCore.Builder.IApplicationBuilder
+    {
+        protected ApplicationSetupContainer() { }
+        protected override sealed void SetupApplication(Microsoft.AspNetCore.Builder.IApplicationBuilder app) { }
+        protected abstract void SetupApplication(THost app);
+    }
+    public interface IConfigurationSetupContainer : Servus.Application.Startup.ISetupContainer
+    {
+        void SetupConfiguration(Microsoft.Extensions.Configuration.IConfigurationManager builder);
+    }
+    public interface IHostApplicationBuilderSetupContainer : Servus.Application.Startup.ISetupContainer
+    {
+        void ConfigureHostApplicationBuilder(Microsoft.Extensions.Hosting.IHostApplicationBuilder builder);
+    }
+    public interface IHostBuilderSetupContainer : Servus.Application.Startup.ISetupContainer
+    {
+        void ConfigureHostBuilder(Microsoft.Extensions.Hosting.IHostBuilder builder);
+    }
+    public interface ILoggingSetupContainer : Servus.Application.Startup.ISetupContainer
+    {
+        void SetupLogging(Microsoft.Extensions.Logging.ILoggingBuilder builder);
+    }
+    public interface IServiceSetupContainer : Servus.Application.Startup.ISetupContainer
+    {
+        void SetupServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration);
+    }
+    public interface ISetupContainer { }
+}
+namespace Servus.Application.Startup.Gates
+{
+    public interface ISetupStartupGates
+    {
+        void OnRegisterStartupGates(Servus.Threading.Tasks.IActionRegistry<Servus.Application.Startup.Gates.IStartupGate> registry);
+    }
+    public interface IStartupGate
+    {
+        System.Threading.Tasks.Task<bool> CheckAsync(System.Threading.CancellationToken token = default);
+    }
+}
+namespace Servus
+{
+    public abstract class AwaitableCondition
+    {
+        protected AwaitableCondition(int timeoutMilliseconds) { }
+        protected AwaitableCondition(System.Threading.CancellationToken token, bool throwExceptionIfCanceled = true) { }
+        protected abstract bool Evaluate();
+        protected virtual void OnCanceled() { }
+        protected virtual bool OnConditionChanged() { }
+        protected virtual void OnFailed() { }
+        protected virtual void OnSuccess() { }
+        public System.Threading.Tasks.Task<bool> WaitAsync() { }
+    }
+    public static class CollectionExtensions
+    {
+        public static void AddRange<T>(this System.Collections.Generic.ICollection<T> collection, System.Collections.Generic.IEnumerable<T> items) { }
+        public static bool IsEmpty<T>(this System.Collections.Generic.IReadOnlyCollection<T> enumerable) { }
+    }
+    public static class DateTimeExtension
+    {
+        public static bool IsBetween(this System.DateTime dateTime, System.DateTime lowerBound, System.DateTime upperBound) { }
+        public static bool IsInFuture(this System.DateTime dateTime) { }
+        public static bool IsPast(this System.DateTime dateTime) { }
+        public static bool IsToday(this System.DateTime dateTime) { }
+        public static bool IsWeekend(this System.DateTime dateTime) { }
+        public static bool IsWorkday(this System.DateTime dateTime) { }
+    }
+    public static class EnumerableExtensions
+    {
+        public static bool Contains<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Predicate<T> predicate) { }
+        public static System.Collections.Generic.IEnumerable<T> DistinctBy<T, TKey>(this System.Collections.Generic.IEnumerable<T> items, System.Func<T, TKey> property) { }
+        public static void ForEach<TSource>(this System.Collections.Generic.IEnumerable<TSource> source, System.Action<TSource> action) { }
+        public static void ForEachIndexed<TSource>(this System.Collections.Generic.IEnumerable<TSource> source, System.Action<TSource, int> action) { }
+        public static int GetIndex<TSource>(this System.Collections.Generic.IEnumerable<TSource> source, System.Func<TSource, bool> predicate) { }
+        public static System.Collections.Generic.IEnumerable<T> InsertAt<T>(this System.Collections.Generic.IEnumerable<T> source, int index, T item) { }
+        public static T[] InsertAt<T>(this T[] array, int index, T item) { }
+        public static System.Collections.Generic.IEnumerable<T> InsertRangeAt<T>(this System.Collections.Generic.IEnumerable<T> source, int index, params T[] item) { }
+        public static T[] InsertRangeAt<T>(this T[] array, int index, params T[] item) { }
+        public static bool TryGet<T>(this System.Collections.Generic.IEnumerable<T> enumerable, System.Predicate<T> predicate, out T? entry) { }
+    }
+    public interface IWithId
+    {
+        System.Guid Id { get; }
+    }
+    public static class Senf
+    {
+        public static readonly Servus.Diagnostics.ServusMetrics Metrics;
+        public static readonly Servus.Diagnostics.ServusTrace Tracing;
+    }
+}
+namespace Servus.Collections
+{
+    public static class AsyncEnumerableExtensions
+    {
+        public static System.Threading.Tasks.Task<bool> AllAsync(this System.Collections.Generic.IAsyncEnumerable<bool> enumerable) { }
+        public static System.Threading.Tasks.Task<bool> AllAsync<T>(this System.Collections.Generic.IAsyncEnumerable<T> enumerable, System.Func<T, bool> predicate) { }
+        public static System.Threading.Tasks.Task<bool> AnyAsync(this System.Collections.Generic.IAsyncEnumerable<bool> enumerable) { }
+        public static System.Threading.Tasks.Task<bool> AnyAsync<T>(this System.Collections.Generic.IAsyncEnumerable<T> enumerable, System.Func<T, bool> predicate) { }
+    }
+    public class CircularQueue<T>
+    {
+        public CircularQueue(int capacity) { }
+        public int Capacity { get; }
+        public int Count { get; }
+        public System.Collections.Generic.IEnumerable<T> Items { get; }
+        public void Enqueue(T item) { }
+        public bool TryDequeue(out T item) { }
+    }
+    public class HandlerRegistry
+    {
+        public HandlerRegistry() { }
+        public int Count { get; }
+        public bool CanHandle(object item) { }
+        public void Clear() { }
+        public System.Collections.Generic.IEnumerable<System.Action<object>> GetMatchingHandlers(object item) { }
+        public bool Handle(object item) { }
+        public int HandleAll(object item) { }
+        public bool Pop() { }
+        public void Register(System.Type type, System.Predicate<object> canHandle, System.Action<object> handler) { }
+        public void Register<T>(System.Action<T> handler) { }
+        public void Register<T>(System.Predicate<T> canHandle, System.Action<T> handler) { }
+        public void Stash() { }
+    }
+    public enum InsertionBehavior : byte
+    {
+        None = 0,
+        OverwriteExisting = 1,
+        ThrowOnExisting = 2,
+    }
+    public sealed class LazyValueCache<TKey, TValue>
+        where TKey :  notnull
+    {
+        public LazyValueCache(Microsoft.Extensions.Caching.Memory.IMemoryCache? cache = null, System.TimeSpan? defaultExpiration = default) { }
+        public System.TimeSpan DefaultExpiration { get; set; }
+        public TValue GetOrCreate(TKey type, System.Func<TValue> provider, System.TimeSpan? expiration = default) { }
+        public bool TryGetValue(TKey type, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TValue? value) { }
+    }
+    public class TypeRegistry<TValue>
+    {
+        protected readonly System.Collections.Concurrent.ConcurrentDictionary<System.Type, TValue> Dictionary;
+        public TypeRegistry() { }
+        public void Add(System.Type key, TValue value) { }
+        public void Add<TKey>(TValue value) { }
+        public TValue Get(System.Type key) { }
+        public TValue Get<TKey>() { }
+        public TValue GetOrAdd(System.Type key, System.Func<TValue> factory) { }
+        public TValue GetOrAdd<TKey>(System.Func<TValue> factory) { }
+    }
+}
+namespace Servus.Concurrency
+{
+    public class NamedSemaphoreSlim : System.Threading.SemaphoreSlim
+    {
+        public string Name { get; }
+        protected override void Dispose(bool disposing) { }
+    }
+    public static class NamedSemaphoreSlimStore
+    {
+        public static Servus.Concurrency.NamedSemaphoreSlim OpenOrCreate(string name, int defaultInitialCount = 1, int defaultMaximumCount = 1) { }
+    }
+}
+namespace Servus.Conversion
+{
+    public sealed class BoolValueConverter : Servus.Conversion.IStringValueConverter
+    {
+        public BoolValueConverter() { }
+        public BoolValueConverter(string[] additionalTrueValues, string[] additionalFalseValues) { }
+        public System.Type OutputType { get; }
+        public object? Convert(string value) { }
+    }
+    public sealed class DoubleValueConverter : Servus.Conversion.IStringValueConverter
+    {
+        public DoubleValueConverter() { }
+        public System.Type OutputType { get; }
+        public object? Convert(string value) { }
+    }
+    public sealed class FloatValueConverter : Servus.Conversion.IStringValueConverter
+    {
+        public FloatValueConverter() { }
+        public System.Type OutputType { get; }
+        public object? Convert(string value) { }
+    }
+    public interface IStringValueConverter
+    {
+        System.Type OutputType { get; }
+        object? Convert(string value);
+    }
+    public sealed class IntegerValueConverter : Servus.Conversion.IStringValueConverter
+    {
+        public IntegerValueConverter() { }
+        public System.Type OutputType { get; }
+        public object? Convert(string value) { }
+    }
+    public class StringConverterCollection
+    {
+        public StringConverterCollection() { }
+        public object? Convert(System.Type targetType, string value) { }
+        public object? Convert<T>(string value) { }
+        public void Register(Servus.Conversion.IStringValueConverter converter, Servus.Collections.InsertionBehavior behavior = 0) { }
+        public void RegisterExceptionHandler(System.Func<System.Exception, object?> handler) { }
+    }
+    public sealed class StringValueConverter : Servus.Conversion.IStringValueConverter
+    {
+        public StringValueConverter() { }
+        public System.Type OutputType { get; }
+        public object? Convert(string value) { }
+    }
+}
+namespace Servus.Diagnostics
+{
+    public interface IServusTraceListener
+    {
+        bool IsEnabled(Servus.Diagnostics.TraceLevel level, string category);
+        void Write(in Servus.Diagnostics.TraceEvent evt);
+    }
+    public class ServusMetrics
+    {
+        public System.Diagnostics.Metrics.Meter Meter { get; }
+    }
+    public class ServusTrace
+    {
+        public System.Diagnostics.ActivitySource Source { get; }
+        public void Configure(Servus.Diagnostics.IServusTraceListener listener, Servus.Diagnostics.TraceLevel minimumLevel = 0, System.Func<string, bool>? categoryFilter = null) { }
+        public void Disable() { }
+        public Servus.Diagnostics.TraceChannel For(string categoryName) { }
+        public void Trace<T>(T source, Servus.Diagnostics.TraceLevel traceLevel, string category, string message, long? ticks = default, params object?[] args) { }
+    }
+    public static class ServusTraceExtensions
+    {
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddServusLoggerTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Servus.Diagnostics.TraceLevel minimumLevel = 1, System.Func<string, bool>? categoryFilter = null) { }
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddServusLoggerTracing(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Servus.Diagnostics.TraceLevel minimumLevel = 1, params string[] categories) { }
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddServusTraceListener(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Servus.Diagnostics.IServusTraceListener listener, Servus.Diagnostics.TraceLevel minimumLevel = 1, System.Func<string, bool>? categoryFilter = null) { }
+        public static Microsoft.Extensions.DependencyInjection.IServiceCollection AddServusTraceListener(this Microsoft.Extensions.DependencyInjection.IServiceCollection services, Servus.Diagnostics.IServusTraceListener listener, Servus.Diagnostics.TraceLevel minimumLevel = 1, params string[] categories) { }
+    }
+    public readonly struct TraceChannel
+    {
+        public TraceChannel(string category) { }
+        public void Debug<T>(T source, string message, params object?[] args) { }
+        public void Error<T>(T source, string message, params object?[] args) { }
+        public void Info<T>(T source, string message, params object?[] args) { }
+        public void Trace<T>(T source, string message, params object?[] args) { }
+        public void Warning<T>(T source, string message, params object?[] args) { }
+    }
+    public readonly struct TraceEvent
+    {
+        public string Category { get; }
+        public Servus.Diagnostics.TraceLevel Level { get; }
+        public int SourceHash { get; }
+        public string SourceType { get; }
+        public string Template { get; }
+        public long TimestampTicks { get; }
+        public string FormatMessage() { }
+    }
+    public enum TraceLevel : byte
+    {
+        Trace = 0,
+        Debug = 1,
+        Info = 2,
+        Warning = 3,
+        Error = 4,
+    }
+}
+namespace Servus.Encoding
+{
+    public class ModHexEncoding : System.Text.Encoding
+    {
+        public ModHexEncoding() { }
+        public static Servus.Encoding.ModHexEncoding ModHex { get; }
+        public override int GetByteCount(char[] chars, int index, int count) { }
+        public override int GetBytes(char[] chars, int charIndex, int charCount, byte[] bytes, int byteIndex) { }
+        public override int GetCharCount(byte[] bytes, int index, int count) { }
+        public override int GetChars(byte[] bytes, int byteIndex, int byteCount, char[] chars, int charIndex) { }
+        public override int GetMaxByteCount(int charCount) { }
+        public override int GetMaxCharCount(int byteCount) { }
+        public static string ConvertFromAscii(string ascii) { }
+        public static string ConvertToAscii(string modHex) { }
+    }
+}
+namespace Servus.Functional
+{
+    public static class TypeExtensions
+    {
+        public static void WhenType<T>(this object target, System.Action<T> handler) { }
+    }
+}
+namespace Servus.Gamification
+{
+    public class Achievement
+    {
+        public Achievement(string name, System.Collections.Generic.IEnumerable<Servus.Gamification.AchievementProperty> properties) { }
+        public bool IsUnlocked { get; }
+        public string Name { get; }
+        public event System.EventHandler? Unlocked;
+    }
+    public class AchievementCollection
+    {
+        public AchievementCollection() { }
+        public System.Collections.Generic.IEnumerable<Servus.Gamification.Achievement> Achievements { get; }
+        public event System.EventHandler<string>? AchievementUnlocked;
+        public void AddAchievement(string name, params string[] propertyName) { }
+        public void AddProperty(string name, double initialValue, double targetValue, Servus.Gamification.CompareRule compareRule, bool autoReset = false) { }
+        public void SetValue(string propertyName, double value) { }
+    }
+    public class AchievementProperty
+    {
+        public AchievementProperty(string name, double initialValue, double targetValue, Servus.Gamification.CompareRule compareRule, bool autoReset) { }
+        public bool AutoReset { get; set; }
+        public Servus.Gamification.CompareRule CompareRule { get; }
+        public bool IsActive { get; }
+        public string Name { get; }
+        public double TargetValue { get; }
+        public double Value { get; set; }
+        public event System.EventHandler? Activated;
+    }
+    public enum CompareRule
+    {
+        Equals = 0,
+        GreaterThen = 1,
+        LowerThen = 2,
+        GreaterOrEquals = 3,
+        LowerOrEquals = 4,
+    }
+}
+namespace Servus.Network
+{
+    public class PortFinder
+    {
+        public PortFinder() { }
+        public static int FindFreeLocalPort() { }
+    }
+}
+namespace Servus.Parsing
+{
+    public static class StringExtensions
+    {
+        public static System.Collections.Generic.IEnumerable<string> GetLines(this string? value) { }
+    }
+}
+namespace Servus.Parsing.Text
+{
+    public class LineKeyValueParser
+    {
+        public LineKeyValueParser(char splitChar) { }
+        public LineKeyValueParser(string splitRegex) { }
+        public System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> Parse(string value) { }
+        public System.Collections.Generic.KeyValuePair<string, string> ParseLine(string value) { }
+    }
+}
+namespace Servus.Reflection
+{
+    public static class InterfaceInvokeExtensions
+    {
+        public static void InvokeIf<TTarget>(this object entity, System.Action<TTarget> action) { }
+        public static TResult? InvokeIf<TTarget, TResult>(this object entity, System.Func<TTarget, TResult> action) { }
+        public static System.Threading.Tasks.Task InvokeIfAsync<TTarget>(this object entity, System.Func<TTarget, System.Threading.Tasks.Task> action) { }
+        public static System.Threading.Tasks.Task<TResult?> InvokeIfAsync<TTarget, TResult>(this object entity, System.Func<TTarget, System.Threading.Tasks.Task<TResult>> action) { }
+    }
+    public static class TypeCheckExtensions
+    {
+        public static TTarget Convert<TTarget>(this object? item) { }
+        public static TTarget? Convert<TTarget>(this object? item, System.Func<object, TTarget> converter) { }
+        public static TTarget? Convert<TInput, TTarget>(this object? item, System.Func<TInput, TTarget> converter) { }
+        public static bool TryConvert<TTarget>(this object? item, out TTarget? value) { }
+    }
+}
+namespace Servus.Text
+{
+    public static class StringExtensions
+    {
+        public static string ToDotCase(this string value) { }
+        public static string ToKebabCase(this string value) { }
+        public static string ToSnakeCase(this string value) { }
+    }
+}
+namespace Servus.Threading
+{
+    public sealed class BlockingTimer : System.IDisposable
+    {
+        public BlockingTimer(System.Action timerAction, double intervalInMilliseconds, System.Threading.CancellationToken cancellationToken = default) { }
+        public void Dispose() { }
+        public void Stop() { }
+    }
+    public static class SemaphoreSlimExtensions
+    {
+        public static System.IDisposable WaitScoped(this System.Threading.SemaphoreSlim semaphoreSlim) { }
+        public static System.Threading.Tasks.Task<System.IDisposable> WaitScopedAsync(this System.Threading.SemaphoreSlim semaphoreSlim, System.Threading.CancellationToken cancellationToken = default) { }
+    }
+}
+namespace Servus.Threading.Tasks
+{
+    public class ActionRegistry<T> : Servus.Threading.Tasks.IActionRegistryRunner<T>, Servus.Threading.Tasks.IActionRegistry<T>
+    {
+        public ActionRegistry() { }
+        protected System.Collections.Generic.IEnumerable<T> GetActions(System.IServiceProvider serviceProvider) { }
+        public void Register(T instance) { }
+        public void Register<TImplementation>()
+            where TImplementation : T { }
+        public void RunAll(System.IServiceProvider sp, System.Action<T, System.Threading.CancellationToken> executor, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.ValueTask RunAllAsync(System.IServiceProvider sp, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask> executor, System.Threading.CancellationToken cancellationToken = default) { }
+        public System.Threading.Tasks.ValueTask RunAsyncParallel(System.IServiceProvider sp, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask> executor, System.Threading.CancellationToken cancellationToken) { }
+    }
+    public class ActionRegistry<TIn, TOut> : Servus.Threading.Tasks.ActionRegistry<TIn>
+        where TIn : Servus.Threading.Tasks.IAsyncTask<TOut>
+    {
+        public ActionRegistry() { }
+        public System.Collections.Generic.IAsyncEnumerable<TOut> RunAllAsync(System.IServiceProvider serviceProvider, [System.Runtime.CompilerServices.EnumeratorCancellation] System.Threading.CancellationToken token = default) { }
+    }
+    public interface IActionRegistryRunner<out T>
+    {
+        void RunAll(System.IServiceProvider sp, System.Action<T, System.Threading.CancellationToken> executor, System.Threading.CancellationToken cancellationToken = default);
+        System.Threading.Tasks.ValueTask RunAllAsync(System.IServiceProvider sp, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask> executor, System.Threading.CancellationToken cancellationToken = default);
+        System.Threading.Tasks.ValueTask RunAsyncParallel(System.IServiceProvider sp, System.Func<T, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask> executor, System.Threading.CancellationToken cancellationToken = default);
+    }
+    public interface IActionRegistry<T>
+    {
+        void Register(T instance);
+        void Register<TImplementation>()
+            where TImplementation : T;
+    }
+    public interface IAsyncTask : Servus.Threading.Tasks.ITaskMarker
+    {
+        System.Threading.Tasks.ValueTask RunAsync(System.Threading.CancellationToken token);
+    }
+    public interface IAsyncTask<T> : Servus.Threading.Tasks.ITaskMarker
+    {
+        System.Threading.Tasks.ValueTask<T> RunAsync(System.Threading.CancellationToken token);
+    }
+    public interface ITaskMarker { }
+    public interface ITaskRegistry<in T>
+        where in T : Servus.Threading.Tasks.ITaskMarker
+    {
+        void Register(T instance);
+        void Register<TTask>()
+            where TTask : T;
+    }
+}
