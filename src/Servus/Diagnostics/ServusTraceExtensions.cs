@@ -18,7 +18,7 @@ public static class ServusTraceExtensions
         {
             var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
             var listener = new TraceLogger(loggerFactory, minimumLevel, categories.Contains);
-            Servus.Tracing.Configure(listener, minimumLevel, categories.Contains);
+            Senf.Tracing.Configure(listener, minimumLevel, categories.Contains);
             return listener;
         });
         return services;
@@ -33,7 +33,7 @@ public static class ServusTraceExtensions
         {
             var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
             var listener = new TraceLogger(loggerFactory, minimumLevel, categoryFilter);
-            Servus.Tracing.Configure(listener, minimumLevel, categoryFilter);
+            Senf.Tracing.Configure(listener, minimumLevel, categoryFilter);
             return listener;
         });
         return services;
@@ -46,7 +46,7 @@ public static class ServusTraceExtensions
         params string[] categories)
     {
         ArgumentNullException.ThrowIfNull(listener);
-        Servus.Tracing.Configure(listener, minimumLevel, categories.Contains);
+        Senf.Tracing.Configure(listener, minimumLevel, categories.Contains);
         services.AddSingleton(listener);
         return services;
     }
@@ -58,7 +58,7 @@ public static class ServusTraceExtensions
         Func<string, bool>? categoryFilter = null)
     {
         ArgumentNullException.ThrowIfNull(listener);
-        Servus.Tracing.Configure(listener, minimumLevel, categoryFilter);
+        Senf.Tracing.Configure(listener, minimumLevel, categoryFilter);
         services.AddSingleton(listener);
         return services;
     }
