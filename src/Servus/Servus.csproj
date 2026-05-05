@@ -38,7 +38,7 @@
         <None Include="../../README.md" Pack="true" PackagePath="\"/>
         <None Include="../../docs/public/logo.png" Pack="true" PackagePath="\"/>
         <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="../../.github/workflows/build-and-release.yml"/>
+        <None Include="../../.github/workflows/build.yml"/>
     </ItemGroup>
     <Target Name="GenerateVersionConst" BeforeTargets="CoreCompile">
         <PropertyGroup>

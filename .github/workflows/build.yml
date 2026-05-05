@@ -1,0 +1,66 @@
+name: Build
+
+on:
+  push:
+    branches: ["develop"]
+  pull_request:
+    branches: ["master", "develop"]
+
+env:
+  GLOBAL_JSON_PATH: "./src/global.json"
+  PROJECT_PATH: "./src/Servus.sln"
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: ${{ env.GLOBAL_JSON_PATH }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Install sonar scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Start sonar scanner
+        if: ${{ env.SONAR_TOKEN && env.SONAR_TOKEN != '' }}
+        run: >
+          dotnet sonarscanner begin
+          /o:"bavaria-black"
+          /k:"servus-core"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.token="$SONAR_TOKEN"
+          /d:sonar.cs.vscoveragexml.reportsPaths=src/TestResults/*.xml
+
+      - name: Build
+        run: >
+          dotnet build
+          --configuration Release
+          --no-restore
+          ${{ env.PROJECT_PATH }}
+
+      - name: Run tests
+        working-directory: "./src"
+        run: >
+          dotnet test
+          --configuration Release
+          --no-ansi
+          --no-build
+          --coverage
+          --coverage-output-format xml
+          --solution Servus.sln
+          --results-directory ./TestResults
+
+      - name: Stop sonar scanner
+        if: ${{ env.SONAR_TOKEN && env.SONAR_TOKEN != '' }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
