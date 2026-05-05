@@ -3,7 +3,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
-using Servus.Core;
+using Servus;
 
 namespace Servus.Benchmarks.Collections;
 
