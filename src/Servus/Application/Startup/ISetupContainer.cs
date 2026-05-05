@@ -1,3 +1,3 @@
-﻿namespace Servus.Core.Application.Startup;
+﻿namespace Servus.Application.Startup;
 
 public interface ISetupContainer;

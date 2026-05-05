@@ -1,3 +1,3 @@
-﻿namespace Servus.Core.Threading.Tasks;
+﻿namespace Servus.Threading.Tasks;
 
 public interface ITaskMarker;

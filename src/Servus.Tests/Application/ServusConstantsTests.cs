@@ -1,24 +1,24 @@
 ﻿using Xunit;
 
-namespace Servus.Core.Tests.Application;
+namespace Servus.Tests.Application;
 
 public class ServusConstantsTests
 {
     [Fact]
     public void LogoTests()
     {
-        Assert.Contains("servus!", Core.Application.Servus.Logo);
+        Assert.Contains("servus!", global::Servus.Application.Servus.Logo);
     }
 
     [Fact]
     public void LogoSmallTests()
     {
-        Assert.Contains("servus!", Core.Application.Servus.LogoSmall);
+        Assert.Contains("servus!", global::Servus.Application.Servus.LogoSmall);
     }
 
     [Fact]
     public void LogoTinyTests()
     {
-        Assert.Contains("servus!", Core.Application.Servus.LogoTiny);
+        Assert.Contains("servus!", global::Servus.Application.Servus.LogoTiny);
     }
 }
