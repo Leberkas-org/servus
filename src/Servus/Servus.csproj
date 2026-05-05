@@ -35,10 +35,9 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>
     </ItemGroup>
     <ItemGroup>
-        <None Include="../../README.md" Pack="true" PackagePath="\"/>
-        <None Include="../../docs/public/logo.png" Pack="true" PackagePath="\"/>
-        <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="../../.github/workflows/build.yml"/>
+        <None Include="../../README.md" Pack="true" Visible="false" PackagePath="\"/>
+        <None Include="../../docs/public/logo.png" Visible="false" Pack="true" PackagePath="\"/>
+        <None Include="../../LICENSE" Pack="true"  Visible="false" PackagePath="\"/>
     </ItemGroup>
     <Target Name="GenerateVersionConst" BeforeTargets="CoreCompile">
         <PropertyGroup>
