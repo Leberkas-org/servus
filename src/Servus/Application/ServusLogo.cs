@@ -2,7 +2,7 @@
 
 namespace Servus.Application;
 
-public static class Servus
+public static class ServusLogo
 {
     public static readonly string Logo = new StringBuilder()
         .AppendLine()

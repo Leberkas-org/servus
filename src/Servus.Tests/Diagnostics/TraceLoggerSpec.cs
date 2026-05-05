@@ -54,7 +54,7 @@ public sealed class TraceLoggerSpec : IDisposable
 
     public void Dispose()
     {
-        Servus.Tracing.Disable();
+        Senf.Tracing.Disable();
     }
 
     [Fact(Timeout = 5000)]
@@ -63,7 +63,7 @@ public sealed class TraceLoggerSpec : IDisposable
         var listener = new TraceLogger(_factory, TraceLevel.Warning);
 
         
-        Servus.Tracing
+        Senf.Tracing
             .For("leberkas")
             .Debug(this, "blub");
         
