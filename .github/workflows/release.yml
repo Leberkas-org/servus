@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    branches: ["master"]
+
+env:
+  GLOBAL_JSON_PATH: "./src/global.json"
+  PROJECT_PATH: "./src/Servus.sln"
+  PACKAGE_OUTPUT_DIRECTORY: "./packages"
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
+
+    steps:
+      - name: Run release-please
+        id: release
+        uses: googleapis/release-please-action@v5
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: ${{ env.GLOBAL_JSON_PATH }}
+
+      - name: Restore dependencies
+        run: dotnet restore ${{ env.PROJECT_PATH }}
+
+      - name: Install sonar scanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Start sonar scanner
+        if: ${{ env.SONAR_TOKEN && env.SONAR_TOKEN != '' }}
+        run: >
+          dotnet sonarscanner begin
+          /o:"bavaria-black"
+          /k:"servus-core"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.token="$SONAR_TOKEN"
+          /d:sonar.cs.vscoveragexml.reportsPaths=src/TestResults/*.xml
+
+      - name: Build
+        run: >
+          dotnet build
+          --configuration Release
+          --no-restore
+          ${{ env.PROJECT_PATH }}
+          /p:Version=${{ needs.release-please.outputs.version }}
+          /p:ContinuousIntegrationBuild=true
+
+      - name: Run tests
+        working-directory: "./src"
+        run: >
+          dotnet test
+          --configuration Release
+          --no-ansi
+          --no-build
+          --coverage
+          --coverage-output-format xml
+          --solution Servus.sln
+          --results-directory ./TestResults
+
+      - name: Stop sonar scanner
+        if: ${{ env.SONAR_TOKEN && env.SONAR_TOKEN != '' }}
+        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+
+      - name: Create NuGet package
+        run: >
+          dotnet pack
+          --configuration Release
+          --no-build
+          --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+          ${{ env.PROJECT_PATH }}
+          /p:PackageVersion=${{ needs.release-please.outputs.version }}
+
+      - name: Publish to NuGet
+        run: >
+          dotnet nuget push
+          --api-key ${{ secrets.NUGET_API_KEY }}
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+          ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
+
+      - name: Attach package to GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ needs.release-please.outputs.tag_name }}
+          files: ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
