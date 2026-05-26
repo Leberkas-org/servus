@@ -1,93 +1,100 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Servus.Application.Startup;
 using Servus.Application.Startup.Gates;
-using Servus.Functional;
 
-namespace Servus.Application.Startup;
+namespace Servus.Application;
 
-public class AppBuilder
+public sealed class ServusApplicationBuilder
 {
-    private readonly List<ISetupContainer> _appSetupContainer = [];
+    private readonly HostApplicationBuilder _hostBuilder;
+    private readonly List<ISetupContainer> _containers = [];
     private readonly List<IStartupGate> _gates = [];
-    private readonly IHostApplicationBuilder _hostBuilder;
-    private readonly Func<IHostApplicationBuilder, IHost> _hostFactory;
 
-    internal Action<IServiceProvider> StartedAction = (_) => { };
-    internal Action StoppedAction = () => { };
+    internal Action<IServiceProvider> StartedAction = _ => { };
     internal Action StoppingAction = () => { };
+    internal Action StoppedAction = () => { };
 
-    private AppBuilder(IHostApplicationBuilder hostBuilder, Func<IHostApplicationBuilder, IHost> hostFactory)
+    internal ServusApplicationBuilder(string[]? args = null)
     {
-        _hostBuilder = hostBuilder;
-        _hostFactory = hostFactory;
+        _hostBuilder = args is null ? Host.CreateApplicationBuilder() : Host.CreateApplicationBuilder(args);
     }
 
-    public static AppBuilder Create<T>(T builder, Func<T, IHost> createHost) where T : IHostApplicationBuilder
-    {
-        return new AppBuilder(builder, b => createHost((T)b));
-    }
+    public IServiceCollection Services => _hostBuilder.Services;
+    public ConfigurationManager Configuration => _hostBuilder.Configuration;
+    public ILoggingBuilder Logging => _hostBuilder.Logging;
 
-    public static AppBuilder Create() => Create(WebApplication.CreateBuilder(), b => b.Build());
-
-    public AppBuilder WithSetup<TContainer>() where TContainer : class, ISetupContainer, new()
+    public ServusApplicationBuilder WithSetup<TContainer>() where TContainer : class, ISetupContainer, new()
         => WithSetup(new TContainer());
 
-    public AppBuilder WithSetup(ISetupContainer container)
+    public ServusApplicationBuilder WithSetup(ISetupContainer container)
     {
-        _hostBuilder.WhenType<WebApplicationBuilder>(b => SetupWebApplicationBuilder(container, b));
-        container.WhenType<IHostApplicationBuilderSetupContainer>(b => b.ConfigureHostApplicationBuilder(_hostBuilder));
-
-        _appSetupContainer.Add(container);
+        _containers.Add(container);
         return this;
     }
 
-    private void SetupWebApplicationBuilder(ISetupContainer container, WebApplicationBuilder builder)
-    {
-        container.WhenType<IHostBuilderSetupContainer>(b => b.ConfigureHostBuilder(builder.Host));
-    }
+    public ServusApplicationBuilder WithStartupGate<TGate>() where TGate : class, IStartupGate, new()
+        => WithStartupGate(new TGate());
 
-    public AppBuilder WithStartupGate(Func<Task<bool>> gate) => WithStartupGate(new ActionStartupGate(gate));
+    public ServusApplicationBuilder WithStartupGate(Func<Task<bool>> gate)
+        => WithStartupGate(new ActionStartupGate(gate));
 
-    public AppBuilder WithStartupGate<TGate>() where TGate : class, IStartupGate, new() => WithStartupGate(new TGate());
-
-    public AppBuilder WithStartupGate(IStartupGate gate)
+    public ServusApplicationBuilder WithStartupGate(IStartupGate gate)
     {
         _gates.Add(gate);
         return this;
     }
 
-    public AppBuilder OnApplicationStarted(Action<IServiceProvider> started)
+    public ServusApplicationBuilder OnApplicationStarted(Action<IServiceProvider> action)
     {
-        StartedAction = started;
+        StartedAction = action;
         return this;
     }
 
-    public AppBuilder OnApplicationStopping(Action stopping)
+    public ServusApplicationBuilder OnApplicationStopping(Action action)
     {
-
-        StoppingAction = stopping;
+        StoppingAction = action;
         return this;
     }
 
-    public AppBuilder OnApplicationStopped(Action stopped)
+    public ServusApplicationBuilder OnApplicationStopped(Action action)
     {
-
-        StoppedAction = stopped;
+        StoppedAction = action;
         return this;
     }
 
-    public AppRunner Build() => new AppRunner(this);
+    public ServusApplication Build() => Build((host, builder) => new ServusApplication(host, builder));
 
-    internal IReadOnlyCollection<TContainerType> GetContainer<TContainerType>() => _appSetupContainer.OfType<TContainerType>().ToList();
+    public TApp Build<TApp>(Func<IHost, ServusApplicationBuilder, TApp> factory) where TApp : ServusApplication
+    {
+        foreach (var container in _containers)
+        {
+            if (container is ILoggingSetupContainer logging)
+                logging.SetupLogging(_hostBuilder.Logging);
+
+            if (container is IConfigurationSetupContainer config)
+                config.SetupConfiguration(_hostBuilder.Configuration);
+
+            if (container is IServiceSetupContainer service)
+                service.SetupServices(_hostBuilder.Services, _hostBuilder.Configuration);
+
+            if (container is IHostApplicationBuilderSetupContainer hostSetup)
+                hostSetup.ConfigureHostApplicationBuilder(_hostBuilder);
+        }
+
+        var host = _hostBuilder.Build();
+        var app = factory(host, this);
+
+        foreach (var container in _containers)
+        {
+            if (container is ApplicationSetupContainer appSetup)
+                appSetup.InjectApp(app);
+        }
+
+        return app;
+    }
+
     internal IReadOnlyCollection<IStartupGate> GetGates() => _gates;
-
-    internal IHostApplicationBuilder GetHostBuilder() => _hostBuilder;
-    internal IHost BuildHost(IHostApplicationBuilder builder) => _hostFactory(builder);
-}
-
-public abstract class ApplicationSetupContainer : ISetupContainer
-{
-    internal void InjectApp(IApplicationBuilder app) => SetupApplication(app);
-
-    protected abstract void SetupApplication(IApplicationBuilder app);
 }

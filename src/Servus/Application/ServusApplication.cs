@@ -1,56 +1,31 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Servus.Application.Startup.Gates;
-using Servus.Reflection;
+using Microsoft.Extensions.Logging;
 
-namespace Servus.Application.Startup;
+namespace Servus.Application;
 
-/// <summary>
-/// Provides static methods for starting and running web applications with custom configuration.
-/// </summary>
-public partial class AppRunner
+public class ServusApplication
 {
-    private readonly IReadOnlyCollection<IServiceSetupContainer> _serviceContainer;
-    private readonly IReadOnlyCollection<ApplicationSetupContainer> _appContainer;
-    private readonly IReadOnlyCollection<IConfigurationSetupContainer> _configContainer;
-    private readonly IReadOnlyCollection<ILoggingSetupContainer> _loggingContainer;
+    private readonly IHost _host;
+    private readonly ServusApplicationBuilder _builder;
 
-    private readonly IReadOnlyCollection<IStartupGate> _startupGates;
-    private readonly IHostApplicationBuilder _builder;
-    private readonly AppBuilder _baseBuilder;
-
-    internal AppRunner(AppBuilder appBuilder)
+    protected internal ServusApplication(IHost host, ServusApplicationBuilder builder)
     {
-        _baseBuilder = appBuilder;
-
-        _builder = appBuilder.GetHostBuilder();
-
-        _serviceContainer = appBuilder.GetContainer<IServiceSetupContainer>();
-        _appContainer = appBuilder.GetContainer<ApplicationSetupContainer>();
-        _configContainer = appBuilder.GetContainer<IConfigurationSetupContainer>();
-        _loggingContainer = appBuilder.GetContainer<ILoggingSetupContainer>();
-        _startupGates = appBuilder.GetGates();
+        _host = host;
+        _builder = builder;
     }
 
-    /// <summary>
-    /// Runs a web application using the specified builder and configuration.
-    /// </summary>
-    /// <param name="token">The cancellation token to cancel the operation. Default is default(CancellationToken).</param>
-    /// <returns>A task that represents the asynchronous run operation.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when builder or configuration is null.</exception>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is cancelled via the cancellation token.</exception>
-    public async Task RunAsync(CancellationToken token = default)
-        => await InternalStartAsync(app => app.RunAsync(), token);
+    public IServiceProvider Services => _host.Services;
 
-    /// <summary>
-    /// Creates and starts a web application using the specified configuration type without blocking.
-    /// </summary>
-    /// <typeparam name="T">The configuration type that inherits from AppConfigurationBase and has a parameterless constructor.</typeparam>
-    /// <param name="token">The cancellation token to cancel the operation.</param>
-    /// <returns>A task that represents the asynchronous start operation.</returns>
-    /// <exception cref="OperationCanceledException">Thrown when the operation is cancelled via the cancellation token.</exception>
-    public async Task StartAsync(CancellationToken token)
-        => await InternalStartAsync(app => app.StartAsync(token), token);
+    public static ServusApplicationBuilder CreateBuilder() => new();
+
+    public static ServusApplicationBuilder CreateBuilder(string[] args) => new(args);
+
+    public async Task RunAsync(CancellationToken token = default)
+        => await InternalStartAsync(host => host.RunAsync(token), token);
+
+    public async Task StartAsync(CancellationToken token = default)
+        => await InternalStartAsync(host => host.StartAsync(token), token);
 
     private async Task InternalStartAsync(Func<IHost, Task> startupMethod, CancellationToken token)
     {
@@ -58,9 +33,9 @@ public partial class AppRunner
 
         try
         {
-            var app = CoreSetupAsync();
-            await RunStartupGatesAsync(app.Services, cts.Token);
-            await startupMethod(app).ConfigureAwait(false);
+            RegisterLifecycleEvents();
+            await RunStartupGatesAsync(cts.Token);
+            await startupMethod(_host).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -70,15 +45,48 @@ public partial class AppRunner
         }
     }
 
-    private IHost CoreSetupAsync()
+    private void RegisterLifecycleEvents()
     {
-        _loggingContainer.ForEach(c => c.SetupLogging(_builder.Logging));
-        _configContainer.ForEach(c => c.SetupConfiguration(_builder.Configuration));
-        _serviceContainer.ForEach(c => c.SetupServices(_builder.Services, _builder.Configuration));
+        var lifetime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
+        lifetime.ApplicationStarted.Register(() => _builder.StartedAction(Services));
+        lifetime.ApplicationStopping.Register(() => _builder.StoppingAction());
+        lifetime.ApplicationStopped.Register(() => _builder.StoppedAction());
+    }
 
-        var app = _baseBuilder.BuildHost(_builder);
-        app.InvokeIf<IApplicationBuilder>(SetupApplication);
+    private async Task RunStartupGatesAsync(CancellationToken cancellationToken)
+    {
+        var delay = TimeSpan.FromSeconds(1);
+        var maxDelay = TimeSpan.FromSeconds(60);
+        var logger = Services.GetService<ILogger<ServusApplication>>();
+        var gates = _builder.GetGates();
 
-        return app;
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var tasks = gates.Select(gate => gate.CheckAsync(cancellationToken));
+            var results = await Task.WhenAll(tasks);
+
+            if (results.All(result => result))
+            {
+                logger?.LogDebug("All startup gates are cleared!");
+                return;
+            }
+
+            await Task.Delay(delay, cancellationToken);
+            var delayMs = delay.TotalMilliseconds * 2;
+            delay = TimeSpan.FromMilliseconds(Math.Min(delayMs, maxDelay.TotalMilliseconds));
+
+            logger?.LogWarning("Not all startup gates are clear. Next retry in [{CurrentDelay}]", delay);
+        }
+    }
+
+    public static string? GetEnvironmentVariable(string name)
+    {
+        return Environment.GetEnvironmentVariable("SERVUS_" + name.ToUpper());
+    }
+
+    public static bool IsEnvironmentVariableSetTo(string name, string value)
+    {
+        var environmentVariable = GetEnvironmentVariable(name);
+        return environmentVariable != null && environmentVariable.Equals(value, StringComparison.OrdinalIgnoreCase);
     }
 }

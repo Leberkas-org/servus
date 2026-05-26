@@ -1,30 +1,48 @@
-using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Servus.Application;
 using Servus.Application.Startup;
 using Xunit;
 
 namespace Servus.Tests.Application.Startup;
 
-public class FailureAppConfigurationTestBase : ApplicationSetupContainer
-{
-    protected override void SetupApplication(IApplicationBuilder app)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class AppConfigurationTestBase : ApplicationSetupContainer<WebApplication>
-{
-    protected override void SetupApplication(WebApplication app)
-    {
-    }
-}
-
-public class HostBuilderSetupContainer : IHostBuilderSetupContainer
+public class ServiceSetup : IServiceSetupContainer
 {
     public bool WasCalled { get; set; }
 
-    public void ConfigureHostBuilder(IHostBuilder builder)
+    public void SetupServices(IServiceCollection services, IConfiguration configuration)
+    {
+        WasCalled = true;
+    }
+}
+
+public class ConfigSetup : IConfigurationSetupContainer
+{
+    public bool WasCalled { get; set; }
+
+    public void SetupConfiguration(IConfigurationManager builder)
+    {
+        WasCalled = true;
+    }
+}
+
+public class LoggingSetup : ILoggingSetupContainer
+{
+    public bool WasCalled { get; set; }
+
+    public void SetupLogging(ILoggingBuilder builder)
+    {
+        WasCalled = true;
+    }
+}
+
+public class HostBuilderSetup : IHostApplicationBuilderSetupContainer
+{
+    public bool WasCalled { get; set; }
+
+    public void ConfigureHostApplicationBuilder(IHostApplicationBuilder builder)
     {
         WasCalled = true;
     }
@@ -32,19 +50,66 @@ public class HostBuilderSetupContainer : IHostBuilderSetupContainer
 
 public class AppStartupTests
 {
-    private static AppBuilder CreateTestAppBuilder()
+    [Fact]
+    public void BuilderInvokesServiceSetupContainer()
     {
-        var builder = WebApplication.CreateBuilder(["--urls", "http://127.0.0.1:0"]);
-        return AppBuilder.Create(builder, b => b.Build());
+        var container = new ServiceSetup();
+        var builder = ServusApplication.CreateBuilder();
+        builder.WithSetup(container);
+        var app = builder.Build();
+
+        Assert.True(container.WasCalled);
+        Assert.NotNull(app.Services);
     }
 
     [Fact]
-    public async Task SuccessfulStartup()
+    public void BuilderInvokesConfigSetupContainer()
+    {
+        var container = new ConfigSetup();
+        var builder = ServusApplication.CreateBuilder();
+        builder.WithSetup(container);
+        builder.Build();
+
+        Assert.True(container.WasCalled);
+    }
+
+    [Fact]
+    public void BuilderInvokesLoggingSetupContainer()
+    {
+        var container = new LoggingSetup();
+        var builder = ServusApplication.CreateBuilder();
+        builder.WithSetup(container);
+        builder.Build();
+
+        Assert.True(container.WasCalled);
+    }
+
+    [Fact]
+    public void BuilderInvokesHostApplicationBuilderSetupContainer()
+    {
+        var container = new HostBuilderSetup();
+        var builder = ServusApplication.CreateBuilder();
+        builder.WithSetup(container);
+        builder.Build();
+
+        Assert.True(container.WasCalled);
+    }
+
+    [Fact]
+    public void WithSetupGenericCreatesAndRegisters()
+    {
+        var builder = ServusApplication.CreateBuilder();
+        builder.WithSetup<ServiceSetup>();
+        var app = builder.Build();
+        Assert.NotNull(app);
+    }
+
+    [Fact]
+    public async Task SuccessfulStartupWithGate()
     {
         var gateIsOpen = false;
         var cts = new CancellationTokenSource();
-        var app = CreateTestAppBuilder()
-            .WithSetup<AppConfigurationTestBase>()
+        var app = ServusApplication.CreateBuilder()
             .WithStartupGate(() =>
             {
                 gateIsOpen = !gateIsOpen;
@@ -61,28 +126,43 @@ public class AppStartupTests
     }
 
     [Fact]
-    public async Task FailedStartup()
+    public async Task CreateBuilderWithArgs()
     {
         var cts = new CancellationTokenSource();
-
-        var app = CreateTestAppBuilder()
-            .WithSetup<AppConfigurationTestBase>()
-            .WithSetup<FailureAppConfigurationTestBase>()
-            .WithStartupGate(() => Task.FromResult(true))
+        var app = ServusApplication.CreateBuilder([])
             .Build();
 
-        await Assert.ThrowsAsync<NotImplementedException>(async () =>
-            await app.StartAsync(cts.Token));
+        await app.StartAsync(cts.Token);
+        Assert.NotNull(app.Services);
+        await cts.CancelAsync();
     }
 
     [Fact]
-    public void HostBuilderSetup()
+    public void GetEnvironmentVariable_ReturnsServusPrefixed()
     {
-        var container = new HostBuilderSetupContainer();
-        _ = AppBuilder.Create()
-            .WithSetup(container)
-            .Build();
+        Environment.SetEnvironmentVariable("SERVUS_TESTVAR", "hello");
+        try
+        {
+            Assert.Equal("hello", ServusApplication.GetEnvironmentVariable("testvar"));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("SERVUS_TESTVAR", null);
+        }
+    }
 
-        Assert.True(container.WasCalled);
+    [Fact]
+    public void IsEnvironmentVariableSetTo_ComparesIgnoreCase()
+    {
+        Environment.SetEnvironmentVariable("SERVUS_TESTFLAG", "True");
+        try
+        {
+            Assert.True(ServusApplication.IsEnvironmentVariableSetTo("testflag", "true"));
+            Assert.False(ServusApplication.IsEnvironmentVariableSetTo("testflag", "false"));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("SERVUS_TESTFLAG", null);
+        }
     }
 }

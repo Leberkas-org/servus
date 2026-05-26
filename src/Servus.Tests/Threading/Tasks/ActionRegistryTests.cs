@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Servus.Collections;
 using Servus.Threading.Tasks;
 using Xunit;
@@ -34,34 +34,36 @@ public class ActionRegistryTests
         async ValueTask<bool> IAsyncTask<bool>.RunAsync(CancellationToken token) => await TestInjectable.RunAsync(true, token);
     }
 
+    private static IServiceProvider BuildServiceProvider()
+    {
+        var builder = Host.CreateApplicationBuilder();
+        builder.Services.AddSingleton<TestInjectable>();
+        return builder.Build().Services;
+    }
+
     [Fact]
     public async Task RegisterTaskTest()
     {
-        var builder = WebApplication.CreateBuilder();
-        builder.Services.AddSingleton<TestInjectable>();
+        var services = BuildServiceProvider();
         var registry = new ActionRegistry<IAsyncTask>();
         registry.Register<TestTask>();
 
-        var app = builder.Build();
-
         var cts = new CancellationTokenSource();
-        await registry.RunAsyncParallel(app.Services, (f, c) => f.RunAsync(c), cts.Token);
-        await registry.RunAllAsync(app.Services, (f, t) => f.RunAsync(t), cts.Token);
+        await registry.RunAsyncParallel(services, (f, c) => f.RunAsync(c), cts.Token);
+        await registry.RunAllAsync(services, (f, t) => f.RunAsync(t), cts.Token);
     }
 
     [Fact]
     public async Task RegisterAsyncTaskTest()
     {
-        var builder = WebApplication.CreateBuilder();
-        builder.Services.AddSingleton<TestInjectable>();
+        var services = BuildServiceProvider();
         var registry = new ActionRegistry<IAsyncTask<bool>, bool>();
         registry.Register<TestTask>();
 
-        var app = builder.Build();
         var cts = new CancellationTokenSource();
 
-        var any = await registry.RunAllAsync(app.Services, cts.Token).AnyAsync();
-        var all = await registry.RunAllAsync(app.Services, cts.Token).AllAsync();
+        var any = await registry.RunAllAsync(services, cts.Token).AnyAsync();
+        var all = await registry.RunAllAsync(services, cts.Token).AllAsync();
 
         Assert.True(any);
         Assert.True(all);
