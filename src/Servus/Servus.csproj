@@ -27,9 +27,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" />
-    </ItemGroup>
-    <ItemGroup>
-        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
     </ItemGroup>
     <ItemGroup>
         <None Include="../../README.md" Pack="true" Visible="false" PackagePath="\"/>
