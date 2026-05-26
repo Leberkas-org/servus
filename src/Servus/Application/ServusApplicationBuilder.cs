@@ -71,17 +71,21 @@ public sealed class ServusApplicationBuilder
     {
         foreach (var container in _containers)
         {
-            if (container is ILoggingSetupContainer logging)
-                logging.SetupLogging(_hostBuilder.Logging);
-
-            if (container is IConfigurationSetupContainer config)
-                config.SetupConfiguration(_hostBuilder.Configuration);
-
-            if (container is IServiceSetupContainer service)
-                service.SetupServices(_hostBuilder.Services, _hostBuilder.Configuration);
-
-            if (container is IHostApplicationBuilderSetupContainer hostSetup)
-                hostSetup.ConfigureHostApplicationBuilder(_hostBuilder);
+            switch (container)
+            {
+                case ILoggingSetupContainer logging:
+                    logging.SetupLogging(_hostBuilder.Logging);
+                    break;
+                case IConfigurationSetupContainer config:
+                    config.SetupConfiguration(_hostBuilder.Configuration);
+                    break;
+                case IServiceSetupContainer service:
+                    service.SetupServices(_hostBuilder.Services, _hostBuilder.Configuration);
+                    break;
+                case IHostApplicationBuilderSetupContainer hostSetup:
+                    hostSetup.ConfigureHostApplicationBuilder(_hostBuilder);
+                    break;
+            }
         }
 
         var host = _hostBuilder.Build();
@@ -90,7 +94,9 @@ public sealed class ServusApplicationBuilder
         foreach (var container in _containers)
         {
             if (container is ApplicationSetupContainer appSetup)
+            {
                 appSetup.InjectApp(app);
+            }
         }
 
         return app;

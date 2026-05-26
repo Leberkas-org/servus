@@ -24,18 +24,6 @@ namespace Servus.Application.Console
         public static void WriteLineColored(string value, System.ConsoleColor color) { }
     }
 }
-namespace Servus.Application.HealthChecks
-{
-    public abstract class HealthCheckSetupContainer : Servus.Application.Startup.ApplicationSetupContainer<Microsoft.AspNetCore.Builder.WebApplication>, Servus.Application.Startup.IServiceSetupContainer, Servus.Application.Startup.ISetupContainer
-    {
-        protected HealthCheckSetupContainer() { }
-        protected virtual string UrlPattern { get; }
-        protected override sealed void SetupApplication(Microsoft.AspNetCore.Builder.WebApplication app) { }
-        protected virtual void SetupEndpointConventions(Microsoft.AspNetCore.Builder.IEndpointConventionBuilder builder) { }
-        protected abstract void SetupHealthChecks(Microsoft.Extensions.DependencyInjection.IHealthChecksBuilder builder);
-        public void SetupServices(Microsoft.Extensions.DependencyInjection.IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration) { }
-    }
-}
 namespace Servus.Application
 {
     public static class ServiceProviderExtensions
@@ -43,10 +31,35 @@ namespace Servus.Application
         public static object ResolveExternal(this System.IServiceProvider serviceProvider, System.Type type) { }
         public static T ResolveExternal<T>(this System.IServiceProvider serviceProvider) { }
     }
-    public static class ServusApplication
+    public class ServusApplication
     {
+        protected ServusApplication(Microsoft.Extensions.Hosting.IHost host, Servus.Application.ServusApplicationBuilder builder) { }
+        public System.IServiceProvider Services { get; }
+        public System.Threading.Tasks.Task RunAsync(System.Threading.CancellationToken token = default) { }
+        public System.Threading.Tasks.Task StartAsync(System.Threading.CancellationToken token = default) { }
+        public static Servus.Application.ServusApplicationBuilder CreateBuilder() { }
+        public static Servus.Application.ServusApplicationBuilder CreateBuilder(string[] args) { }
         public static string? GetEnvironmentVariable(string name) { }
         public static bool IsEnvironmentVariableSetTo(string name, string value) { }
+    }
+    public sealed class ServusApplicationBuilder
+    {
+        public Microsoft.Extensions.Configuration.ConfigurationManager Configuration { get; }
+        public Microsoft.Extensions.Logging.ILoggingBuilder Logging { get; }
+        public Microsoft.Extensions.DependencyInjection.IServiceCollection Services { get; }
+        public Servus.Application.ServusApplication Build() { }
+        public TApp Build<TApp>(System.Func<Microsoft.Extensions.Hosting.IHost, Servus.Application.ServusApplicationBuilder, TApp> factory)
+            where TApp : Servus.Application.ServusApplication { }
+        public Servus.Application.ServusApplicationBuilder OnApplicationStarted(System.Action<System.IServiceProvider> action) { }
+        public Servus.Application.ServusApplicationBuilder OnApplicationStopped(System.Action action) { }
+        public Servus.Application.ServusApplicationBuilder OnApplicationStopping(System.Action action) { }
+        public Servus.Application.ServusApplicationBuilder WithSetup(Servus.Application.Startup.ISetupContainer container) { }
+        public Servus.Application.ServusApplicationBuilder WithSetup<TContainer>()
+            where TContainer :  class, Servus.Application.Startup.ISetupContainer, new () { }
+        public Servus.Application.ServusApplicationBuilder WithStartupGate(Servus.Application.Startup.Gates.IStartupGate gate) { }
+        public Servus.Application.ServusApplicationBuilder WithStartupGate(System.Func<System.Threading.Tasks.Task<bool>> gate) { }
+        public Servus.Application.ServusApplicationBuilder WithStartupGate<TGate>()
+            where TGate :  class, Servus.Application.Startup.Gates.IStartupGate, new () { }
     }
     public static class ServusLogo
     {
@@ -57,38 +70,16 @@ namespace Servus.Application
 }
 namespace Servus.Application.Startup
 {
-    public class AppBuilder
-    {
-        public Servus.Application.Startup.AppRunner Build() { }
-        public Servus.Application.Startup.AppBuilder OnApplicationStarted(System.Action<System.IServiceProvider> started) { }
-        public Servus.Application.Startup.AppBuilder OnApplicationStopped(System.Action stopped) { }
-        public Servus.Application.Startup.AppBuilder OnApplicationStopping(System.Action stopping) { }
-        public Servus.Application.Startup.AppBuilder WithSetup(Servus.Application.Startup.ISetupContainer container) { }
-        public Servus.Application.Startup.AppBuilder WithSetup<TContainer>()
-            where TContainer :  class, Servus.Application.Startup.ISetupContainer, new () { }
-        public Servus.Application.Startup.AppBuilder WithStartupGate(Servus.Application.Startup.Gates.IStartupGate gate) { }
-        public Servus.Application.Startup.AppBuilder WithStartupGate(System.Func<System.Threading.Tasks.Task<bool>> gate) { }
-        public Servus.Application.Startup.AppBuilder WithStartupGate<TGate>()
-            where TGate :  class, Servus.Application.Startup.Gates.IStartupGate, new () { }
-        public static Servus.Application.Startup.AppBuilder Create() { }
-        public static Servus.Application.Startup.AppBuilder Create<T>(T builder, System.Func<T, Microsoft.Extensions.Hosting.IHost> createHost)
-            where T : Microsoft.Extensions.Hosting.IHostApplicationBuilder { }
-    }
-    public class AppRunner
-    {
-        public System.Threading.Tasks.Task RunAsync(System.Threading.CancellationToken token = default) { }
-        public System.Threading.Tasks.Task StartAsync(System.Threading.CancellationToken token) { }
-    }
     public abstract class ApplicationSetupContainer : Servus.Application.Startup.ISetupContainer
     {
         protected ApplicationSetupContainer() { }
-        protected abstract void SetupApplication(Microsoft.AspNetCore.Builder.IApplicationBuilder app);
+        protected abstract void SetupApplication(Servus.Application.ServusApplication app);
     }
     public abstract class ApplicationSetupContainer<THost> : Servus.Application.Startup.ApplicationSetupContainer
-        where THost : Microsoft.AspNetCore.Builder.IApplicationBuilder
+        where THost : Servus.Application.ServusApplication
     {
         protected ApplicationSetupContainer() { }
-        protected override sealed void SetupApplication(Microsoft.AspNetCore.Builder.IApplicationBuilder app) { }
+        protected override sealed void SetupApplication(Servus.Application.ServusApplication app) { }
         protected abstract void SetupApplication(THost app);
     }
     public interface IConfigurationSetupContainer : Servus.Application.Startup.ISetupContainer
@@ -98,10 +89,6 @@ namespace Servus.Application.Startup
     public interface IHostApplicationBuilderSetupContainer : Servus.Application.Startup.ISetupContainer
     {
         void ConfigureHostApplicationBuilder(Microsoft.Extensions.Hosting.IHostApplicationBuilder builder);
-    }
-    public interface IHostBuilderSetupContainer : Servus.Application.Startup.ISetupContainer
-    {
-        void ConfigureHostBuilder(Microsoft.Extensions.Hosting.IHostBuilder builder);
     }
     public interface ILoggingSetupContainer : Servus.Application.Startup.ISetupContainer
     {
