@@ -14,6 +14,6 @@ Primitives and helpers for dealing with asynchronous work, timers, locks, and ba
 
 | Namespace | Types |
 |---|---|
-| `Servus.Core.Concurrency` | `NamedSemaphoreSlim`, `NamedSemaphoreSlimStore` |
-| `Servus.Core.Threading` | `BlockingTimer`, `AwaitableCondition`, `SemaphoreSlimExtensions` |
-| `Servus.Core.Threading.Tasks` | `ITaskMarker`, `IAsyncTask`, `IAsyncTask<T>`, `IActionRegistry<T>`, `IActionRegistryRunner<T>`, `ActionRegistry<T>`, `ActionRegistry<TIn,TOut>` |
+| `Servus.Concurrency` | `NamedSemaphoreSlim`, `NamedSemaphoreSlimStore` |
+| `Servus.Threading` | `BlockingTimer`, `AwaitableCondition`, `SemaphoreSlimExtensions` |
+| `Servus.Threading.Tasks` | `ITaskMarker`, `IAsyncTask`, `IAsyncTask<T>`, `IActionRegistry<T>`, `IActionRegistryRunner<T>`, `ActionRegistry<T>`, `ActionRegistry<TIn,TOut>` |

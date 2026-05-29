@@ -2,19 +2,19 @@
 layout: home
 
 hero:
-  name: Servus.Core
+  name: Servus
   text: A general-purpose .NET utility library
   tagline: The Swiss Army knife for .NET developers who are tired of reinventing the wheel.
   image:
     src: /logo.png
-    alt: Servus.Core logo
+    alt: Servus logo
   actions:
     - theme: brand
       text: Get Started
       link: /getting-started
     - theme: alt
       text: View on GitHub
-      link: https://github.com/Bavaria-Black/servus.core
+      link: https://github.com/Leberkas-org/servus
 
 features:
   - icon:

@@ -7,8 +7,8 @@ Use this when you need to serialize access by a **logical resource name** — e.
 ## Usage
 
 ```csharp
-using Servus.Core.Concurrency;
-using Servus.Core.Threading;
+using Servus.Concurrency;
+using Servus.Threading;
 
 public async Task UpdateUserAsync(string userId, CancellationToken token)
 {

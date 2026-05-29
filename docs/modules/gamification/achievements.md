@@ -5,7 +5,7 @@ An achievement is a named bundle of **properties** that all have to be "active" 
 ## Quick start
 
 ```csharp
-using Servus.Core.Gamification;
+using Servus.Gamification;
 
 var achievements = new AchievementCollection();
 

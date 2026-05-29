@@ -5,7 +5,7 @@
 ## Usage
 
 ```csharp
-using Servus.Core.Parsing.Text;
+using Servus.Parsing.Text;
 
 var parser = new LineKeyValueParser('=');
 

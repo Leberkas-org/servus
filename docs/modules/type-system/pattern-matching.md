@@ -5,7 +5,7 @@
 ## Usage
 
 ```csharp
-using Servus.Core.Functional;
+using Servus.Functional;
 
 object value = GetSomething();
 

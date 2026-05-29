@@ -5,7 +5,7 @@ Memory-cached lazy initialisation with per-entry expiration. Values are produced
 ## Usage
 
 ```csharp
-using Servus.Core.Collections;
+using Servus.Collections;
 
 var cache = new LazyValueCache<string, ExchangeRate>(
     defaultExpiration: TimeSpan.FromMinutes(5));

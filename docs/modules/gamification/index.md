@@ -10,4 +10,4 @@ A small achievement-tracking system. Register numeric properties, define target 
 
 | Namespace | Types |
 |---|---|
-| `Servus.Core.Gamification` | `Achievement`, `AchievementProperty`, `AchievementCollection`, `CompareRule` |
+| `Servus.Gamification` | `Achievement`, `AchievementProperty`, `AchievementCollection`, `CompareRule` |

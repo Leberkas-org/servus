@@ -5,7 +5,7 @@ A thin wrapper around `ConcurrentDictionary<Type, TValue>` with `GetOrAdd` seman
 ## Usage
 
 ```csharp
-using Servus.Core.Collections;
+using Servus.Collections;
 
 var registry = new TypeRegistry<Func<object, string>>();
 

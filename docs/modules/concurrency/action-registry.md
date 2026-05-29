@@ -47,7 +47,7 @@ public interface IActionRegistryRunner<out T>        // execute
 Register either a type (resolved from the service provider on execution) or a concrete instance:
 
 ```csharp
-using Servus.Core.Threading.Tasks;
+using Servus.Threading.Tasks;
 
 var registry = new ActionRegistry<IHealthCheckTask>();
 

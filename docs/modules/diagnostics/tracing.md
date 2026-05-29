@@ -1,150 +1,183 @@
 # Tracing
 
-Distributed-tracing helpers built on top of `System.Diagnostics.ActivitySource`. Two things here:
+Zero-cost developer tracing built on `System.Diagnostics.ActivitySource`. When no listener is configured, trace calls are no-ops (single null-check).
 
-1. **`IWithTracing`** — interface you put on messages/events so they carry `TraceId`/`SpanId` across boundaries (queues, gRPC, HTTP).
-2. **`ActivitySourceRegistry`** — centralised `ActivitySource` management so you don't spawn one per class.
+The entry point is `Senf.Tracing` — a static `ServusTrace` instance. You create named channels, trace through them, and wire up a listener at startup.
 
-## `IWithTracing`
-
-Stamp this interface onto any DTO that crosses a boundary:
+## Quick start
 
 ```csharp
-public class ProcessOrderMessage : IWithTracing
+using Servus.Diagnostics;
+
+// 1. Create a channel (store in a static field for zero-allocation reuse)
+private static readonly TraceChannel _trace = Senf.Tracing.For("OrderService");
+
+// 2. Trace at any level
+_trace.Info(this, "Processing order {0}", orderId);
+_trace.Debug(this, "Calculated total: {0:C}", total);
+_trace.Warning(this, "Retry attempt {0} of {1}", attempt, maxRetries);
+```
+
+Without a listener configured, every call above is a no-op.
+
+## Configuring a listener
+
+### Via DI — bridge to `ILogger`
+
+The most common setup: pipe trace events into the standard logging pipeline.
+
+```csharp
+using Servus.Diagnostics;
+
+builder.Services.AddServusLoggerTracing(TraceLevel.Debug);
+```
+
+Filter by category:
+
+```csharp
+builder.Services.AddServusLoggerTracing(
+    TraceLevel.Debug,
+    "OrderService", "PaymentService");
+
+// Or with a predicate
+builder.Services.AddServusLoggerTracing(
+    TraceLevel.Debug,
+    category => category.StartsWith("Order"));
+```
+
+### Manual — custom listener
+
+Implement `IServusTraceListener` for custom sinks (metrics, file, network):
+
+```csharp
+public class ConsoleTraceListener : IServusTraceListener
 {
-    public string? TraceId { get; set; }
-    public string? SpanId { get; set; }
+    public bool IsEnabled(TraceLevel level, string category) => true;
 
-    public int OrderId { get; set; }
-    public decimal Amount { get; set; }
-
-    public ActivityContext GetContext() => /* provided by the interface default logic */;
-}
-```
-
-### Before sending — capture the current context
-
-```csharp
-var msg = new ProcessOrderMessage { OrderId = 42, Amount = 19.90m };
-
-// Capture current Activity into TraceId/SpanId
-((IWithTracing)msg).AddTracing();
-
-await messageQueue.SendAsync(msg);
-```
-
-### Alternative context sources
-
-```csharp
-msg.AddTracing(otherTracing);              // copy from another IWithTracing
-msg.AddTracing(traceId, spanId);           // set explicitly
-```
-
-## `ActivitySourceRegistry`
-
-A static registry keyed by `Type`. Each type gets an `ActivitySource` whose name is automatically derived (snake_case of the type name) unless you override it.
-
-```csharp
-using Servus.Core.Diagnostics;
-
-// Register once, early in startup
-ActivitySourceRegistry.Add<OrderService>();
-ActivitySourceRegistry.Add<PaymentService>("payments.core");
-```
-
-### Starting an activity from a message
-
-`StartActivity<T>` uses the registered `ActivitySource` for `T` and the context from the incoming `IWithTracing` message:
-
-```csharp
-public class OrderService
-{
-    public async Task HandleOrderMessage(ProcessOrderMessage message)
+    public void Write(in TraceEvent evt)
     {
-        using var activity = ActivitySourceRegistry.StartActivity<OrderService>(
-            "process-order", message);
-
-        await ProcessOrderAsync(message.OrderId);
-    }
-}
-```
-
-## `ActivitySourceNameAttribute`
-
-Attach to a class so the registry uses a fixed name regardless of the type's own name:
-
-```csharp
-[ActivitySourceName("MyCompany.OrderProcessing")]
-public class OrderService
-{
-    // ActivitySource name is resolved from the attribute, not derived.
-}
-```
-
-This is the cleanest way to keep source names under your control.
-
-## `ActivitySourceKeyAttribute`
-
-Designate *another* class as the primary ActivitySource. Useful when a hierarchy of helper classes should roll up under one named source — you avoid having one ActivitySource per helper.
-
-```csharp
-[ActivitySourceKey(typeof(OrderService))]
-public class SubOrderProcess
-{
-    public void DoWork()
-    {
-        // Resolves to OrderService's ActivitySource
-        using var activity = ActivitySourceRegistry.StartActivity<SubOrderProcess>(
-            "do-work", message);
+        Console.WriteLine($"[{evt.Level}] {evt.Category}/{evt.SourceType}: {evt.FormatMessage()}");
     }
 }
 
-[ActivitySourceName("MyCompany.OrderProcessing")]
-public class OrderService { }
+// Register
+builder.Services.AddServusTraceListener(
+    new ConsoleTraceListener(),
+    TraceLevel.Trace);
+```
+
+## `TraceChannel`
+
+A channel is bound to a single category. It exposes level-specific methods:
+
+```csharp
+private static readonly TraceChannel _trace = Senf.Tracing.For("MyCategory");
+
+_trace.Trace(this, "Finest detail");
+_trace.Debug(this, "Diagnostic info");
+_trace.Info(this, "Notable event: {0}", eventName);
+_trace.Warning(this, "Unexpected state: {0}", state);
+_trace.Error(this, "Failed: {0}", exception.Message);
+```
+
+Each method takes the source object (`this`) for identity tracking and a format template with optional arguments. Formatting is deferred — the `TraceEvent.FormatMessage()` allocation only happens inside the listener.
+
+## `TraceEvent`
+
+An immutable struct passed to listeners:
+
+| Property | Type | Description |
+|---|---|---|
+| `TimestampTicks` | `long` | `Stopwatch.GetTimestamp()` value |
+| `Level` | `TraceLevel` | Severity |
+| `Category` | `string` | Channel category name |
+| `SourceType` | `string` | Short type name of the source object |
+| `SourceHash` | `int` | Identity hash of the source object |
+| `Template` | `string` | Format template |
+
+Call `FormatMessage()` to produce the formatted string.
+
+## `TraceLevel`
+
+```csharp
+public enum TraceLevel : byte
+{
+    Trace   = 0,
+    Debug   = 1,
+    Info    = 2,
+    Warning = 3,
+    Error   = 4,
+}
+```
+
+Maps directly to `Microsoft.Extensions.Logging.LogLevel`.
+
+## `ActivitySource`
+
+`ServusTrace` also exposes an `ActivitySource` named `"Servus"` for OpenTelemetry integration:
+
+```csharp
+using var activity = Senf.Tracing.Source.StartActivity("process-order");
 ```
 
 ## API
 
 ```csharp
-public interface IWithTracing
+public static class Senf
 {
-    string? TraceId { get; set; }
-    string? SpanId { get; set; }
-
-    ActivityContext GetContext();
-    void AddTracing();
-    void AddTracing(IWithTracing tracing);
-    void AddTracing(string? traceId, string? spanId);
-
-    Activity? StartActivity(string name, ActivitySource source,
-                            ActivityKind kind = ActivityKind.Consumer);
+    public static readonly ServusTrace Tracing;
+    public static readonly ServusMetrics Metrics;
 }
 
-public static class ActivitySourceRegistry
+public class ServusTrace
 {
-    public static void Add<T>(string? name = null);
-    public static void Add(Type key, string? name = null);
+    public ActivitySource Source { get; }
 
-    public static Activity? StartActivity<T>(
-        string activityName, IWithTracing trace,
-        ActivityKind kind = ActivityKind.Consumer);
+    public void Configure(IServusTraceListener listener,
+        TraceLevel minimumLevel = TraceLevel.Trace,
+        Func<string, bool>? categoryFilter = null);
 
-    public static Activity? StartActivity(
-        Type key, string activityName, IWithTracing trace,
-        ActivityKind kind = ActivityKind.Consumer);
+    public TraceChannel For(string categoryName);
+    public void Disable();
 }
 
-[AttributeUsage(AttributeTargets.Class)]
-public class ActivitySourceNameAttribute : Attribute
+public readonly struct TraceChannel
 {
-    public ActivitySourceNameAttribute(string name);
-    public string ActivitySourceName { get; }
+    public void Trace<T>(T source, string message, params object?[] args);
+    public void Debug<T>(T source, string message, params object?[] args);
+    public void Info<T>(T source, string message, params object?[] args);
+    public void Warning<T>(T source, string message, params object?[] args);
+    public void Error<T>(T source, string message, params object?[] args);
 }
 
-[AttributeUsage(AttributeTargets.Class)]
-public class ActivitySourceKeyAttribute : Attribute
+public interface IServusTraceListener
 {
-    public ActivitySourceKeyAttribute(Type sourceKey);
-    public Type SourceKey { get; }
+    bool IsEnabled(TraceLevel level, string category);
+    void Write(in TraceEvent evt);
+}
+
+public static class ServusTraceExtensions
+{
+    public static IServiceCollection AddServusLoggerTracing(
+        this IServiceCollection services,
+        TraceLevel minimumLevel = TraceLevel.Debug,
+        params string[] categories);
+
+    public static IServiceCollection AddServusLoggerTracing(
+        this IServiceCollection services,
+        TraceLevel minimumLevel = TraceLevel.Debug,
+        Func<string, bool>? categoryFilter = null);
+
+    public static IServiceCollection AddServusTraceListener(
+        this IServiceCollection services,
+        IServusTraceListener listener,
+        TraceLevel minimumLevel = TraceLevel.Debug,
+        params string[] categories);
+
+    public static IServiceCollection AddServusTraceListener(
+        this IServiceCollection services,
+        IServusTraceListener listener,
+        TraceLevel minimumLevel = TraceLevel.Debug,
+        Func<string, bool>? categoryFilter = null);
 }
 ```

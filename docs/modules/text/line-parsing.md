@@ -5,7 +5,7 @@
 ## Usage
 
 ```csharp
-using Servus.Core.Parsing;
+using Servus.Parsing;
 
 string response = await httpClient.GetStringAsync(url);
 
@@ -21,7 +21,7 @@ Handles both `\n` and `\r\n` line endings, and correctly yields empty lines so y
 ## API
 
 ```csharp
-public static class StringExtensions  // namespace: Servus.Core.Parsing
+public static class StringExtensions  // namespace: Servus.Parsing
 {
     public static IEnumerable<string> GetLines(this string? value);
 }

@@ -12,7 +12,7 @@ public interface IWithId
 ## Usage
 
 ```csharp
-using Servus.Core;
+using Servus;
 
 public class Order : IWithId
 {

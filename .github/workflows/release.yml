@@ -51,19 +51,6 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore ${{ env.PROJECT_PATH }}
 
-      - name: Install sonar scanner
-        run: dotnet tool install --global dotnet-sonarscanner
-
-      - name: Start sonar scanner
-        if: ${{ env.SONAR_TOKEN && env.SONAR_TOKEN != '' }}
-        run: >
-          dotnet sonarscanner begin
-          /o:"bavaria-black"
-          /k:"servus-core"
-          /d:sonar.host.url="https://sonarcloud.io"
-          /d:sonar.token="$SONAR_TOKEN"
-          /d:sonar.cs.vscoveragexml.reportsPaths=src/TestResults/*.xml
-
       - name: Build
         run: >
           dotnet build
@@ -84,10 +71,6 @@ jobs:
           --coverage-output-format xml
           --solution Servus.sln
           --results-directory ./TestResults
-
-      - name: Stop sonar scanner
-        if: ${{ env.SONAR_TOKEN && env.SONAR_TOKEN != '' }}
-        run: dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
       - name: Create NuGet package
         run: >

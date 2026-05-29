@@ -10,4 +10,4 @@ A short list of `DateTime` extensions for the predicate checks you end up writin
 
 | Namespace | Types |
 |---|---|
-| `Servus.Core` | `DateTimeExtension` |
+| `Servus` | `DateTimeExtension` |

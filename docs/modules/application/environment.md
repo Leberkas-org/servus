@@ -7,7 +7,7 @@ A small helper for reading `SERVUS_*` prefixed environment variables, plus a han
 Every call prefixes `SERVUS_` automatically — so you pass the local name, not the fully qualified one.
 
 ```csharp
-using Servus.Core.Application;
+using Servus.Application;
 
 // Reads the env var "SERVUS_REGION"
 var region = ServusApplication.GetEnvironmentVariable("REGION");
@@ -34,15 +34,15 @@ public static class ServusApplication
 Three ASCII logos in decreasing size. Useful for startup banners and `--version` output.
 
 ```csharp
-using Servus.Core.Application;
+using Servus.Application;
 
-Console.WriteLine(Servus.Logo);       // big
-Console.WriteLine(Servus.LogoSmall);  // medium
-Console.WriteLine(Servus.LogoTiny);   // minimal
+Console.WriteLine(ServusLogo.Logo);       // big
+Console.WriteLine(ServusLogo.LogoSmall);  // medium
+Console.WriteLine(ServusLogo.LogoTiny);   // minimal
 ```
 
 ```csharp
-public static class Servus
+public static class ServusLogo
 {
     public static string Logo { get; }
     public static string LogoSmall { get; }
@@ -55,7 +55,7 @@ public static class Servus
 Extension methods for resolving services, including types that aren't registered in DI but whose constructor dependencies are:
 
 ```csharp
-using Servus.Core.Application;
+using Servus.Application;
 
 // Resolve a registered service
 var repo = serviceProvider.ResolveExternal<IUserRepository>();
