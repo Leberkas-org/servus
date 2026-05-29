@@ -9,6 +9,8 @@
     "preview": "vitepress preview"
   },
   "devDependencies": {
-    "vitepress": "^1.6.3"
+    "@fontsource/fraunces": "^5.2.9",
+    "@fontsource/vollkorn": "^5.2.10",
+    "vitepress": "^1.6.4"
   }
 }
