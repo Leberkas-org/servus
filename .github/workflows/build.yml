@@ -1,8 +1,9 @@
 name: Build
 
 on:
+  workflow_dispatch:
   push:
-    branches: ["develop"]
+    branches: ["develop", "release-please--branches--master"]
   pull_request:
     branches: ["master", "develop"]
 
