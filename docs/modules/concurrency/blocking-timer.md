@@ -5,7 +5,7 @@ A timer that guarantees **non-overlapping** execution — if the previous tick i
 ## Usage
 
 ```csharp
-using Servus.Core.Threading;
+using Servus.Threading;
 
 using var cts = new CancellationTokenSource();
 

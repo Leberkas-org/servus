@@ -1,0 +1,16 @@
+{
+  "name": "servus-core-docs",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "@fontsource/fraunces": "^5.2.9",
+    "@fontsource/vollkorn": "^5.2.10",
+    "vitepress": "^1.6.4"
+  }
+}

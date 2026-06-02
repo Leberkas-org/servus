@@ -3,7 +3,7 @@
 Small predicate helpers on `DateTime`. Each one is a one-liner you'd otherwise re-write per project.
 
 ```csharp
-using Servus.Core;
+using Servus;
 
 var dt = DateTime.UtcNow;
 

@@ -13,6 +13,6 @@ Helpers for converting, checking, and conditionally invoking based on runtime ty
 
 | Namespace | Types |
 |---|---|
-| `Servus.Core.Conversion` | `IStringValueConverter`, `BoolValueConverter`, `IntegerValueConverter`, `FloatValueConverter`, `DoubleValueConverter`, `StringValueConverter`, `StringConverterCollection` |
-| `Servus.Core.Reflection` | `InterfaceInvokeExtensions`, `TypeCheckExtensions` |
-| `Servus.Core.Functional` | `TypeExtensions` (`WhenType`) |
+| `Servus.Conversion` | `IStringValueConverter`, `BoolValueConverter`, `IntegerValueConverter`, `FloatValueConverter`, `DoubleValueConverter`, `StringValueConverter`, `StringConverterCollection` |
+| `Servus.Reflection` | `InterfaceInvokeExtensions`, `TypeCheckExtensions` |
+| `Servus.Functional` | `TypeExtensions` (`WhenType`) |

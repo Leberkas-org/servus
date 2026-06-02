@@ -5,7 +5,7 @@
 ## Usage
 
 ```csharp
-using Servus.Core.Network;
+using Servus.Network;
 
 int port = PortFinder.FindFreeLocalPort();
 

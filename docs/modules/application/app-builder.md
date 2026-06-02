@@ -5,7 +5,7 @@
 ## Quick start
 
 ```csharp
-using Servus.Core.Application.Startup;
+using Servus.Application.Startup;
 
 var app = AppBuilder
     .Create()

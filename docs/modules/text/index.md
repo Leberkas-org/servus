@@ -13,7 +13,7 @@ String helpers that do what you wish the BCL already did — case conversion for
 
 | Namespace | Types |
 |---|---|
-| `Servus.Core.Text` | `StringExtensions` (case conversion) |
-| `Servus.Core.Parsing` | `StringExtensions` (`GetLines`) |
-| `Servus.Core.Parsing.Text` | `LineKeyValueParser` |
-| `Servus.Core.Encoding` | `ModHexEncoding` |
+| `Servus.Text` | `StringExtensions` (case conversion) |
+| `Servus.Parsing` | `StringExtensions` (`GetLines`) |
+| `Servus.Parsing.Text` | `LineKeyValueParser` |
+| `Servus.Encoding` | `ModHexEncoding` |

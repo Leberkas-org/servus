@@ -5,7 +5,7 @@ Two extension methods on `SemaphoreSlim` that give you `using`-friendly acquire/
 ## Usage
 
 ```csharp
-using Servus.Core.Threading;
+using Servus.Threading;
 
 private readonly SemaphoreSlim _gate = new(1, 1);
 

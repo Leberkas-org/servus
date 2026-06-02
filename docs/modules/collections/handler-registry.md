@@ -14,7 +14,7 @@ The registry supports **first-match** dispatch (`Handle`) and **all-matches** di
 ## Basic usage
 
 ```csharp
-using Servus.Core.Collections;
+using Servus.Collections;
 
 var registry = new HandlerRegistry();
 

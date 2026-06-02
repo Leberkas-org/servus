@@ -5,7 +5,7 @@
 ## `ServusConsole` — colored output
 
 ```csharp
-using Servus.Core.Application.Console;
+using Servus.Application.Console;
 
 ServusConsole.WriteColored("OK ", ConsoleColor.Green);
 ServusConsole.WriteLineColored("All systems go.", ConsoleColor.Gray);

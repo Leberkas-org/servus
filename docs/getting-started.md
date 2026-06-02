@@ -2,28 +2,28 @@
 
 *Servus! Schee, dass du da bist.* 🥨
 
-**Servus.Core** was born out of frustration — the kind every developer knows when you find yourself writing the same helper methods over and over again. This library is a collection of those "I wish this was built into .NET" utilities that somehow always end up missing from your toolkit.
+**Servus** was born out of frustration — the kind every developer knows when you find yourself writing the same helper methods over and over again. This library is a collection of those "I wish this was built into .NET" utilities that somehow always end up missing from your toolkit.
 
-Whether it's string manipulation that actually makes sense, date handling that doesn't make you cry, or collection operations that just work the way you expect them to — **Servus.Core** has you covered.
+Whether it's string manipulation that actually makes sense, date handling that doesn't make you cry, or collection operations that just work the way you expect them to — **Servus** has you covered.
 
 ## Installation
 
 ### Package Manager
 
 ```powershell
-Install-Package Servus.Core
+Install-Package Servus
 ```
 
 ### .NET CLI
 
 ```bash
-dotnet add package Servus.Core
+dotnet add package Servus
 ```
 
 ### PackageReference
 
 ```xml
-<PackageReference Include="Servus.Core" Version="1.0.0" />
+<PackageReference Include="Servus" Version="1.0.0" />
 ```
 
 ## What's Inside
@@ -36,7 +36,7 @@ Browse the sidebar to explore the modules:
 
 ## Contributing
 
-Contributions are welcome. Fork the repository, create a feature branch, write tests, and open a pull request. See the [GitHub repository](https://github.com/Bavaria-Black/servus.core) for details.
+Contributions are welcome. Fork the repository, create a feature branch, write tests, and open a pull request. See the [GitHub repository](https://github.com/Leberkas-org/servus) for details.
 
 ---
 

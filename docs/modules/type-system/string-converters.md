@@ -27,8 +27,8 @@ Each converter owns one output type. The collection routes `Convert<T>(string)` 
 ## Usage
 
 ```csharp
-using Servus.Core.Conversion;
-using Servus.Core.Collections; // InsertionBehavior
+using Servus.Conversion;
+using Servus.Collections; // InsertionBehavior
 
 var converters = new StringConverterCollection();
 converters.Register(new BoolValueConverter());

@@ -3,7 +3,7 @@
 Three extensions on `string` that convert from the typical .NET identifier (PascalCase / camelCase) into the three most-asked-for styles:
 
 ```csharp
-using Servus.Core.Text;
+using Servus.Text;
 
 "UserAccountId".ToSnakeCase();  // "user_account_id"
 "UserAccountId".ToKebabCase();  // "user-account-id"
@@ -21,7 +21,7 @@ They also survive mixed input shapes:
 ## API
 
 ```csharp
-public static partial class StringExtensions  // namespace: Servus.Core.Text
+public static partial class StringExtensions  // namespace: Servus.Text
 {
     public static string ToSnakeCase(this string value);
     public static string ToKebabCase(this string value);

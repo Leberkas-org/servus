@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: 'Servus.Core',
+  title: 'Servus',
   description: 'A general-purpose .NET utility library',
   lang: 'en-US',
   cleanUrls: true,
@@ -11,12 +11,12 @@ export default defineConfig({
   ],
   themeConfig: {
     logo: '/logo.png',
-    siteTitle: 'Servus.Core',
+    siteTitle: 'Servus',
     search: {
       provider: 'local'
     },
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/Bavaria-Black/servus.core' }
+      { icon: 'github', link: 'https://github.com/Leberkas-org/servus' }
     ],
     nav: [
       { text: 'Get Started', link: '/getting-started' },
@@ -52,9 +52,9 @@ export default defineConfig({
       {
         text: 'Resources',
         items: [
-          { text: 'GitHub Repository', link: 'https://github.com/Bavaria-Black/servus.core' },
-          { text: 'NuGet Package', link: 'https://www.nuget.org/packages/Servus.Core/' },
-          { text: 'Report an Issue', link: 'https://github.com/Bavaria-Black/servus.core/issues' }
+          { text: 'GitHub Repository', link: 'https://github.com/Leberkas-org/servus' },
+          { text: 'NuGet Package', link: 'https://www.nuget.org/packages/Servus/' },
+          { text: 'Report an Issue', link: 'https://github.com/Leberkas-org/servus/issues' }
         ]
       }
     ],
@@ -156,15 +156,13 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/modules/utilities/' },
             { text: 'Port Finder', link: '/modules/utilities/port-finder' },
-            { text: 'Yubikey OTP', link: '/modules/utilities/yubikey' },
-            { text: 'Notify Property Changed', link: '/modules/utilities/notify-property-changed' },
             { text: 'IWithId', link: '/modules/utilities/with-id' }
           ]
         }
       ]
     },
     footer: {
-      message: 'Pfiat di und happy coding! 🥨🍺',
+      message: 'Servus and happy coding! 🥨🍺',
       copyright: '© 2026 Leberkas.org · MIT License'
     },
     notFound: {

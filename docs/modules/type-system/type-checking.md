@@ -7,7 +7,7 @@ Two tiny extension methods that wrap `is`/`as` and `Convert.ChangeType` into API
 Returns `true` and the converted value when the item is (or can be coerced to) `T`, `false` otherwise. No exceptions.
 
 ```csharp
-using Servus.Core.Reflection;
+using Servus.Reflection;
 
 object raw = "42";
 

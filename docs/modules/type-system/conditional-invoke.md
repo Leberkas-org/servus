@@ -19,7 +19,7 @@ pattern, and it has async and return-value variants.
 ## Usage
 
 ```csharp
-using Servus.Core.Reflection;
+using Servus.Reflection;
 
 object someObject = new FileStream("file.txt", FileMode.Open);
 

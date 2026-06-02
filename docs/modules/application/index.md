@@ -15,8 +15,8 @@ Everything you need to bootstrap a .NET application with clean, testable startup
 
 | Namespace | Location |
 |---|---|
-| `Servus.Core.Application` | Root app helpers (logo, env) |
-| `Servus.Core.Application.Startup` | `AppBuilder`, `AppRunner`, setup container contracts |
-| `Servus.Core.Application.Startup.Gates` | `IStartupGate` + `ISetupStartupGates` |
-| `Servus.Core.Application.HealthChecks` | `HealthCheckSetupContainer` |
-| `Servus.Core.Application.Console` | `ServusConsole`, `ProcessOutRedirector` |
+| `Servus.Application` | Root app helpers (logo, env) |
+| `Servus.Application.Startup` | `AppBuilder`, `AppRunner`, setup container contracts |
+| `Servus.Application.Startup.Gates` | `IStartupGate` + `ISetupStartupGates` |
+| `Servus.Application.HealthChecks` | `HealthCheckSetupContainer` |
+| `Servus.Application.Console` | `ServusConsole`, `ProcessOutRedirector` |

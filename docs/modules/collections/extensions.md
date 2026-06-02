@@ -9,12 +9,12 @@ A grab-bag of extension methods for `IEnumerable<T>`, `ICollection<T>`, `IReadOn
 Keep the first element per key:
 
 ```csharp
-using Servus.Core;
+using Servus;
 
 var firstPerCountry = users.DistinctBy(u => u.Country);
 ```
 
-> Note: .NET 6 added a built-in `DistinctBy`. Servus.Core's version predates it and stays for compatibility.
+> Note: .NET 6 added a built-in `DistinctBy`. Servus's version predates it and stays for compatibility.
 
 ### `GetIndex`
 
@@ -79,7 +79,7 @@ The array overloads are optimised paths that avoid enumeration.
 Batch-add into any `ICollection<T>`; `List<T>` already has this, generic `ICollection<T>` does not.
 
 ```csharp
-using Servus.Core;
+using Servus;
 
 ICollection<int> items = new HashSet<int>();
 items.AddRange([1, 2, 3, 4]);
@@ -101,7 +101,7 @@ if (pendingOrders.IsEmpty())
 LINQ-like short-circuiting helpers over `IAsyncEnumerable<T>`.
 
 ```csharp
-using Servus.Core.Collections;
+using Servus.Collections;
 
 // Returns true on the first matching element
 bool hasFailure = await healthStream.AnyAsync(h => !h.IsHealthy);
@@ -117,7 +117,7 @@ bool allTrue  = await boolStream.AllAsync();
 ## API summary
 
 ```csharp
-// Servus.Core
+// Servus
 public static class CollectionExtensions
 {
     public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> items);
@@ -139,7 +139,7 @@ public static partial class EnumerableExtensions
     public static IEnumerable<T> InsertRangeAt<T>(this IEnumerable<T> source, int index, params T[] items);
 }
 
-// Servus.Core.Collections
+// Servus.Collections
 public static class AsyncEnumerableExtensions
 {
     public static Task<bool> AnyAsync(this IAsyncEnumerable<bool> enumerable);

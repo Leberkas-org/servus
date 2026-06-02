@@ -14,5 +14,5 @@ A handful of data structures and LINQ-like extensions that the BCL doesn't give 
 
 | Namespace | Types |
 |---|---|
-| `Servus.Core.Collections` | `CircularQueue<T>`, `HandlerRegistry`, `TypeRegistry<TValue>`, `LazyValueCache<TKey,TValue>`, `InsertionBehavior`, `AsyncEnumerableExtensions` |
-| `Servus.Core` | `CollectionExtensions`, `EnumerableExtensions`, `EnumerableExtensions.Insert` |
+| `Servus.Collections` | `CircularQueue<T>`, `HandlerRegistry`, `TypeRegistry<TValue>`, `LazyValueCache<TKey,TValue>`, `InsertionBehavior`, `AsyncEnumerableExtensions` |
+| `Servus` | `CollectionExtensions`, `EnumerableExtensions`, `EnumerableExtensions.Insert` |

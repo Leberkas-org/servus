@@ -7,7 +7,7 @@ It derives from `System.Text.Encoding`, so anywhere an `Encoding` is accepted wi
 ## Usage
 
 ```csharp
-using Servus.Core.Encoding;
+using Servus.Encoding;
 
 // Singleton instance
 var encoding = ModHexEncoding.ModHex;
@@ -41,5 +41,5 @@ public class ModHexEncoding : System.Text.Encoding
 
 ## When you'd reach for this
 
-- Parsing or generating Yubikey OTPs (the [Yubikey validator](/modules/utilities/yubikey) uses this under the hood).
+- Parsing or generating Yubikey OTPs.
 - Any hardware that emits data as US-English keystrokes to avoid keyboard-layout issues.

@@ -5,7 +5,7 @@ A generic FIFO queue with a fixed capacity. Once full, each new item silently dr
 ## Usage
 
 ```csharp
-using Servus.Core.Collections;
+using Servus.Collections;
 
 var buffer = new CircularQueue<string>(3);
 
