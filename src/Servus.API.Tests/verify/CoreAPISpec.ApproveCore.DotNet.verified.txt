@@ -294,6 +294,25 @@ namespace Servus.Conversion
 }
 namespace Servus.Diagnostics
 {
+    public static class CounterExtensions
+    {
+        public static void Down<T>(this System.Diagnostics.Metrics.UpDownCounter<T> counter)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Down<T>(this System.Diagnostics.Metrics.Counter<T> counter, params System.Collections.Generic.KeyValuePair<string, object?>[]? tags)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Down<T>(this System.Diagnostics.Metrics.UpDownCounter<T> counter, T value)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Down<T>(this System.Diagnostics.Metrics.Counter<T> counter, T value, params System.Collections.Generic.KeyValuePair<string, object?>[]? tags)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Up<T>(this System.Diagnostics.Metrics.UpDownCounter<T> counter)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Up<T>(this System.Diagnostics.Metrics.Counter<T> counter, params System.Collections.Generic.KeyValuePair<string, object?>[] tags)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Up<T>(this System.Diagnostics.Metrics.UpDownCounter<T> counter, T value)
+            where T :  struct, System.Numerics.INumber<T> { }
+        public static void Up<T>(this System.Diagnostics.Metrics.Counter<T> counter, T value, params System.Collections.Generic.KeyValuePair<string, object?>[] tags)
+            where T :  struct, System.Numerics.INumber<T> { }
+    }
     public interface IServusTraceListener
     {
         bool IsEnabled(Servus.Diagnostics.TraceLevel level, string category);
