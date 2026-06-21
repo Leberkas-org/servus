@@ -328,6 +328,7 @@ namespace Servus.Diagnostics
         public void Configure(Servus.Diagnostics.IServusTraceListener listener, Servus.Diagnostics.TraceLevel minimumLevel = 0, System.Func<string, bool>? categoryFilter = null) { }
         public void Disable() { }
         public Servus.Diagnostics.TraceChannel For(string categoryName) { }
+        public bool IsEnabled(string category, Servus.Diagnostics.TraceLevel level) { }
         public void Trace<T>(T source, Servus.Diagnostics.TraceLevel traceLevel, string category, string message, long? ticks = default, params object?[] args) { }
     }
     public static class ServusTraceExtensions
@@ -341,10 +342,26 @@ namespace Servus.Diagnostics
     {
         public TraceChannel(string category) { }
         public void Debug<T>(T source, string message, params object?[] args) { }
+        public void Debug<T, TArg1>(T source, string message, TArg1 arg1) { }
+        public void Debug<T, TArg1, TArg2>(T source, string message, TArg1 arg1, TArg2 arg2) { }
+        public void Debug<T, TArg1, TArg2, TArg3>(T source, string message, TArg1 arg1, TArg2 arg2, TArg3 arg3) { }
         public void Error<T>(T source, string message, params object?[] args) { }
+        public void Error<T, TArg1>(T source, string message, TArg1 arg1) { }
+        public void Error<T, TArg1, TArg2>(T source, string message, TArg1 arg1, TArg2 arg2) { }
+        public void Error<T, TArg1, TArg2, TArg3>(T source, string message, TArg1 arg1, TArg2 arg2, TArg3 arg3) { }
         public void Info<T>(T source, string message, params object?[] args) { }
+        public void Info<T, TArg1>(T source, string message, TArg1 arg1) { }
+        public void Info<T, TArg1, TArg2>(T source, string message, TArg1 arg1, TArg2 arg2) { }
+        public void Info<T, TArg1, TArg2, TArg3>(T source, string message, TArg1 arg1, TArg2 arg2, TArg3 arg3) { }
+        public bool IsEnabled(Servus.Diagnostics.TraceLevel level) { }
         public void Trace<T>(T source, string message, params object?[] args) { }
+        public void Trace<T, TArg1>(T source, string message, TArg1 arg1) { }
+        public void Trace<T, TArg1, TArg2>(T source, string message, TArg1 arg1, TArg2 arg2) { }
+        public void Trace<T, TArg1, TArg2, TArg3>(T source, string message, TArg1 arg1, TArg2 arg2, TArg3 arg3) { }
         public void Warning<T>(T source, string message, params object?[] args) { }
+        public void Warning<T, TArg1>(T source, string message, TArg1 arg1) { }
+        public void Warning<T, TArg1, TArg2>(T source, string message, TArg1 arg1, TArg2 arg2) { }
+        public void Warning<T, TArg1, TArg2, TArg3>(T source, string message, TArg1 arg1, TArg2 arg2, TArg3 arg3) { }
     }
     public readonly struct TraceEvent
     {
