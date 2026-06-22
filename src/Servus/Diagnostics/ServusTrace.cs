@@ -65,10 +65,18 @@ public class ServusTrace
         var cfg = _config;
         if (cfg is null) return false;
         if (level < cfg.MinimumLevel) return false;
-        
-        return cfg.CategoryFilter.Invoke(category) 
+
+        return cfg.CategoryFilter.Invoke(category)
                && cfg.Listener.IsEnabled(level, category);
     }
+
+    /// <summary>
+    /// Returns whether a trace at <paramref name="level"/> for <paramref name="category"/> would be
+    /// emitted. Public so the fixed-arity <see cref="TraceChannel"/> overloads can short-circuit
+    /// before constructing a params array / boxing value-type arguments at the call site.
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsEnabled(string category, TraceLevel level) => ShouldTrace(category, level);
     
     public void Trace<T>(T source, TraceLevel traceLevel, string category, string message, long? ticks = null, params object?[] args)
     {
