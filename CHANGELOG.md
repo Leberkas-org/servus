@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.35.0](https://github.com/Leberkas-org/servus/compare/v0.34.0...v0.35.0) (2026-09-29)
+
+
+### Features
+
+* add BackoffPolicy for exponential backoff delay calculation ([71d562b](https://github.com/Leberkas-org/servus/commit/71d562bf98eed45f3ef2d5dc96fa92d7b30e75ca))
+* add Up and Down extensions ([462c3ec](https://github.com/Leberkas-org/servus/commit/462c3ec0714a87ebcadca219ff46331310c839b0))
+* add Up and Down extensions ([#11](https://github.com/Leberkas-org/servus/issues/11)) ([a1ad28f](https://github.com/Leberkas-org/servus/commit/a1ad28f1412527983220b2f3fb1f78d7f2d6ad23))
+
+
+### Performance
+
+* **trace:** Add zero-alloc tracing overloads ([7faac6c](https://github.com/Leberkas-org/servus/commit/7faac6c3024b76dcc0da13719a207583197f34b4))
+* **trace:** Add zero-alloc tracing overloads ([#13](https://github.com/Leberkas-org/servus/issues/13)) ([8c75ee5](https://github.com/Leberkas-org/servus/commit/8c75ee597978b5603abb8f3eaf01a6ba2f30c391))
+
 ## [0.34.0](https://github.com/Leberkas-org/servus/compare/v0.33.11...v0.34.0) (2026-06-02)
 
 
