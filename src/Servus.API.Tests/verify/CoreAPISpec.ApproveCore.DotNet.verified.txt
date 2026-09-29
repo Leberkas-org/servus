@@ -485,6 +485,18 @@ namespace Servus.Reflection
         public static bool TryConvert<TTarget>(this object? item, out TTarget? value) { }
     }
 }
+namespace Servus.Resilience
+{
+    public static class Backoff
+    {
+        public static Servus.Resilience.BackoffPolicy Create(System.TimeSpan initialDelay, double multiplier = 2, System.TimeSpan? maxDelay = default) { }
+    }
+    public sealed class BackoffPolicy
+    {
+        public System.TimeSpan Delay(int attempt) { }
+        public System.TimeSpan DelayWithJitter(int attempt) { }
+    }
+}
 namespace Servus.Text
 {
     public static class StringExtensions

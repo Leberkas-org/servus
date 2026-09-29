@@ -28,7 +28,8 @@ export default defineConfig({
             items: [
               { text: 'Application', link: '/modules/application/' },
               { text: 'Concurrency', link: '/modules/concurrency/' },
-              { text: 'Diagnostics', link: '/modules/diagnostics/' }
+              { text: 'Diagnostics', link: '/modules/diagnostics/' },
+              { text: 'Resilience', link: '/modules/resilience/' }
             ]
           },
           {
@@ -148,6 +149,14 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/modules/gamification/' },
             { text: 'Achievements', link: '/modules/gamification/achievements' }
+          ]
+        },
+        {
+          text: 'Resilience',
+          collapsed: true,
+          items: [
+            { text: 'Overview', link: '/modules/resilience/' },
+            { text: 'Backoff', link: '/modules/resilience/backoff' }
           ]
         },
         {
