@@ -1,17 +1,19 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Servus.Resilience;
 
 namespace Servus.Application.Startup;
 
 public partial class AppRunner
 {
+    /// <summary>Wait between checks of closed startup gates: 1 s, doubling up to 60 s.</summary>
+    internal static readonly BackoffPolicy GateBackoff = Backoff.Create(TimeSpan.FromSeconds(1), 2.0, TimeSpan.FromSeconds(60));
+
     private async Task RunStartupGatesAsync(IServiceProvider serviceProvider, CancellationToken cancellationToken)
     {
-        var delay = TimeSpan.FromSeconds(1); // Start with 1 sec
-        var maxDelay = TimeSpan.FromSeconds(60);
         var logger = serviceProvider.GetService<ILogger<AppRunner>>();
 
-        while (!cancellationToken.IsCancellationRequested)
+        for (var attempt = 0; !cancellationToken.IsCancellationRequested; attempt++)
         {
             var tasks = _startupGates.Select(gate => gate.CheckAsync(cancellationToken));
             var results = await Task.WhenAll(tasks);
@@ -22,17 +24,9 @@ public partial class AppRunner
                 return; // All gates are ready
             }
 
-            // Wait with exponential backoff
-            await Task.Delay(delay, cancellationToken);
-            var delayMs = CalculateNetExponentialBackoffDelay(delay).Milliseconds;
-            delay = TimeSpan.FromMilliseconds(Math.Min(delayMs, maxDelay.Milliseconds));
-
+            var delay = GateBackoff.Delay(attempt);
             logger?.LogWarning("Not all startup gates are clear. Next retry in [{CurrentDelay}]", delay);
+            await Task.Delay(delay, cancellationToken);
         }
-    }
-
-    internal TimeSpan CalculateNetExponentialBackoffDelay(TimeSpan currentDelay)
-    {
-        return TimeSpan.FromMilliseconds(currentDelay.TotalMilliseconds * 2);
     }
 }
