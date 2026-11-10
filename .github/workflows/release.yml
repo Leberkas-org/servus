@@ -81,10 +81,16 @@ jobs:
           ${{ env.PROJECT_PATH }}
           /p:PackageVersion=${{ needs.release-please.outputs.version }}
 
+      - name: NuGet login (OIDC)
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Publish to NuGet
         run: >
           dotnet nuget push
-          --api-key ${{ secrets.NUGET_API_KEY }}
+          --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
           ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg
