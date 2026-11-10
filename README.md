@@ -3,7 +3,7 @@
 > A general-purpose .NET utility library. Filled with features that you didn't know you actually missed ;)
 
 [![NuGet](https://img.shields.io/nuget/v/Servus.svg?style=flat-square)](https://www.nuget.org/packages/Servus/)
-[![Docs](https://img.shields.io/badge/docs-leberkas.org-123C73?style=flat-square)](https://docs.leberkas.org/servuscore)
+[![Docs](https://img.shields.io/badge/docs-servus.leberkas.org-123C73?style=flat-square)](https://servus.leberkas.org/)
 [![License](https://img.shields.io/github/license/Leberkas-org/servus?style=flat-square)](LICENSE)
 [![Downloads](https://img.shields.io/nuget/dt/Servus.svg?style=flat-square)](https://www.nuget.org/packages/Servus/)
 
