@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.35.1](https://github.com/Leberkas-org/servus/compare/v0.35.0...v0.35.1) (2026-11-10)
+
+
+### Bug Fixes
+
+* wait the full backoff between startup gate checks ([50c9924](https://github.com/Leberkas-org/servus/commit/50c9924b743f7b7bc109814523b393b66ac8bc50))
+
+
+### Documentation
+
+* point readme docs badge to servus.leberkas.org ([a227326](https://github.com/Leberkas-org/servus/commit/a227326272d7c08dd095dda1a908e63ceb293722))
+
 ## [0.35.0](https://github.com/Leberkas-org/servus/compare/v0.34.0...v0.35.0) (2026-09-29)
 
 
